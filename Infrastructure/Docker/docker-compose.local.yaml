@@ -3,7 +3,7 @@ services:
     build:
       context: ../../
       dockerfile: Infrastructure/Docker/Dockerfile.local
-    container_name: servall-api
+    container_name: evm-api
     ports:
       - "5000:80"
       - "5443:443"

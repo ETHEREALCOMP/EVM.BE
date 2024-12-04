@@ -1,11 +1,11 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/syndicate-434705/servall-be:latest', '-f', './Infrastructure/Docker/Dockerfile', '.']
+  args: ['build', '-t', 'gcr.io/syndicate-434705/evm-be:latest', '-f', './Infrastructure/Docker/Dockerfile', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/syndicate-434705/servall-be:latest']
+  args: ['push', 'gcr.io/syndicate-434705/evm-be:latest']
 
 images:
-- 'gcr.io/syndicate-434705/servall-be:latest'
+- 'gcr.io/syndicate-434705/evm-be:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY

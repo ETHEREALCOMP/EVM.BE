@@ -15,4 +15,4 @@ WORKDIR /App
 ENV ASPNETCORE_URLS=https://+:8080
 
 COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "APIForge.API.dll"]
+ENTRYPOINT ["dotnet", "EVM.API.dll"]

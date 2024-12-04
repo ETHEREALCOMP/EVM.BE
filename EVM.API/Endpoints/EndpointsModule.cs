@@ -7,7 +7,5 @@ public static class EndpointsModule
         IdentityEndpoints.Register(app);
         UsersEndpoints.Register(app);
         PaymentsEndpoints.Register(app);
-        EnvironmentEndpoints.Register(app);
-        EnvironmentVariableEndpoints.Register(app);
     }
 }

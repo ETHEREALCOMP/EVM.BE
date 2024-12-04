@@ -21,4 +21,4 @@ COPY --from=build-env /App/out .
 EXPOSE 80
 EXPOSE 443
 
-ENTRYPOINT ["dotnet", "APIForge.API.dll"]
+ENTRYPOINT ["dotnet", "EVM.API.dll"]
