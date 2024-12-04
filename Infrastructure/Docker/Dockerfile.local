@@ -1,0 +1,24 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /App
+
+COPY . ./
+
+RUN dotnet restore
+RUN dotnet publish -c Release -o out
+
+# Stage 2: Build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /App
+
+ENV ASPNETCORE_URLS="http://*:80;https://*:443"
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/https-dev-cert.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Password=yourpassword
+
+COPY ./Infrastructure/Docker/https-dev-cert.pfx /https/
+
+COPY --from=build-env /App/out .
+
+EXPOSE 80
+EXPOSE 443
+
+ENTRYPOINT ["dotnet", "APIForge.API.dll"]
