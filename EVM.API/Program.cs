@@ -33,6 +33,9 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
+// Add authorization services
+builder.Services.AddAuthorization();
+
 Database.Register(builder.Services, builder.Configuration);
 IdentityModule.Register(builder.Services, builder.Configuration);
 
