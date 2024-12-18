@@ -1,4 +1,8 @@
-﻿namespace EVM.API.Endpoints;
+﻿using EVM.Services.Features.Identity.Commands;
+using EVM.Services.Features.Identity.Models.Requests;
+using Microsoft.AspNetCore.Mvc;
+
+namespace EVM.API.Endpoints;
 
 public static class IdentityEndpoints
 {
@@ -6,51 +10,25 @@ public static class IdentityEndpoints
 
     public static void Register(WebApplication app)
     {
-        // Get current identity (GET)
-        app.MapGet(Routes.Identity.Current, 
-            () => Results.Ok())
-            .RequireAuthorization()
-            .WithTags(Tag);a
-
-        // Sign in (post)
-        app.MapPost(Routes.Identity.Signin, 
-            () => Results.Ok())
+        app.MapPost(Routes.Identity.Signin,
+            ([FromServices] SigninCommand command,
+            [FromBody] SigninRequest request)
+            => command.ExecuteAsync(request))
+            .AllowAnonymous()
             .WithTags(Tag);
 
-        // Google Sign in (post)
-        app.MapPost(Routes.Identity.GoogleSignin, 
-            () => Results.Ok())
-            .WithTags(Tag);
+        app.MapPost(Routes.Identity.Signup,
+           ([FromServices] SignupCommand command,
+           [FromBody] SignupRequest request,
+           CancellationToken cancellationToken)
+           => command.ExecuteAsync(request, cancellationToken))
+           .AllowAnonymous()
+           .WithTags(Tag);
 
-        // Meta Sign in (post) 
-        app.MapPost(Routes.Identity.MetaSignin, 
-            () => Results.Ok())
-            .WithTags(Tag);
-
-        // Apple Sign in (post)
-        app.MapPost(Routes.Identity.AppleSignin, 
-            () => Results.Ok())
-            .WithTags(Tag);
-
-        // Sign up route (post)
-        app.MapPost(Routes.Identity.Signup, 
-            () => Results.Ok())
-            .WithTags(Tag);
-
-        // Sign out route (post)
-        app.MapPost(Routes.Identity.Signout, 
-            () => Results.Ok())
-            .RequireAuthorization()
-            .WithTags(Tag);
-
-        // Forgot password (post)
-        app.MapPost(Routes.Identity.Forgot, 
-            () => Results.Ok())
-            .WithTags(Tag);
-
-        // Reset password (post)
-        app.MapPost(Routes.Identity.Reset, 
-            () => Results.Ok())
-            .WithTags(Tag);
+        app.MapPost(Routes.Identity.Signout,
+           ([FromServices] SignoutCommand command)
+           => command.ExecuteAsync())
+           .RequireAuthorization()
+           .WithTags(Tag);
     }
 }
