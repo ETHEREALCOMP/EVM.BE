@@ -1,4 +1,5 @@
 ﻿using EVM.Data.Models;
+using EVM.Data.Models.EventFeature;
 using EVM.Data.Models.IdentityFeature;
 using EVM.Data.Models.PaymentsFeature;
 using Microsoft.AspNetCore.Identity;
@@ -18,6 +19,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> _options)
     public DbSet<Invoice> Invoices { get; set; }
 
     public DbSet<ProjectUser> ProjectUsers { get; set; }
+
+    public DbSet<Coupon> Coupons { get; set; }
+
+    public DbSet<Event> Events { get; set; }
+
+    public DbSet<Ticket> Ticket { get; set; }
+
+    public DbSet<TicketTypes> TicketTypes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
