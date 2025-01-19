@@ -1,7 +1,9 @@
 ﻿using EVM.Data.Models;
 using EVM.Data.Models.EventFeature;
 using EVM.Data.Models.IdentityFeature;
-using EVM.Data.Models.PaymentsFeature;
+using EVM.Data.Models.PaymentFeature;
+using EVM.Data.Models.ResourceFeature;
+using EVM.Data.Models.TicketFeature;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -12,21 +14,17 @@ namespace EVM.Data;
 public class AppDbContext(DbContextOptions<AppDbContext> _options)
     : IdentityDbContext<User, Role, Guid>(_options)
 {
-    public DbSet<Subscription> Subscriptions { get; set; }
-
-    public DbSet<SubscriptionItem> SubscriptionItems { get; set; }
-
-    public DbSet<Invoice> Invoices { get; set; }
-
-    public DbSet<ProjectUser> ProjectUsers { get; set; }
-
-    public DbSet<Coupon> Coupons { get; set; }
-
     public DbSet<Event> Events { get; set; }
 
-    public DbSet<Ticket> Ticket { get; set; }
+    public DbSet<Organizer> Organizers { get; set; }
 
-    public DbSet<TicketTypes> TicketTypes { get; set; }
+    public DbSet<Resource> Resources { get; set; }
+
+    public DbSet<Ticket> Tickets { get; set; }
+
+    public DbSet<Payment> Payments { get; set; }
+
+    public DbSet<EventTask> EventTasks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

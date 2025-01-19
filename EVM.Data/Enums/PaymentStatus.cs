@@ -2,10 +2,9 @@
 
 public enum PaymentStatus
 {
-    Unknown = 0,
+    None = 0,
 
-    Created = 1,
-    Pending = 2,
-    Failed = 3,
-    Completed = 4,
+    Success = 1,
+
+    Failed = 2,
 }

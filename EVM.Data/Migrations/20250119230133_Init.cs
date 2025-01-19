@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -7,25 +6,22 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EVM.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Payment",
+                name: "Organizers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    PaymentUserId = table.Column<string>(type: "text", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    Currency = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    OrganizerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    ContactInfo = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Payment", x => x.Id);
+                    table.PrimaryKey("PK_Organizers", x => x.OrganizerId);
                 });
 
             migrationBuilder.CreateTable(
@@ -48,7 +44,8 @@ namespace EVM.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    PaymentUserId = table.Column<string>(type: "text", nullable: true),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false),
                     UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
@@ -70,6 +67,29 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    FinishedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Location = table.Column<string>(type: "text", nullable: false),
+                    OrganizerId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Events_Organizers_OrganizerId",
+                        column: x => x.OrganizerId,
+                        principalTable: "Organizers",
+                        principalColumn: "OrganizerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "RoleClaim",
                 columns: table => new
                 {
@@ -86,32 +106,6 @@ namespace EVM.Data.Migrations
                         name: "FK_RoleClaim_Role_RoleId",
                         column: x => x.RoleId,
                         principalTable: "Role",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProjectUsers",
-                columns: table => new
-                {
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProjectId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uuid", nullable: false),
-                    Role = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProjectUsers", x => new { x.UserId, x.ProjectId });
-                    table.ForeignKey(
-                        name: "FK_ProjectUsers_User_CreatedById",
-                        column: x => x.CreatedById,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProjectUsers_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -138,32 +132,6 @@ namespace EVM.Data.Migrations
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Subscription",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    PaymentUserId = table.Column<string>(type: "text", nullable: true),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    CurrentPeriodStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CurrentPeriodEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CancelAtPeriodEnd = table.Column<bool>(type: "boolean", nullable: false),
-                    CanceledOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CancelsOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Subscription", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Subscription_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -252,74 +220,135 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Invoice",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    PaymentUserId = table.Column<string>(type: "text", nullable: true),
-                    SubscriptionId = table.Column<string>(type: "text", nullable: false),
-                    AmountPaid = table.Column<decimal>(type: "numeric(8,2)", precision: 8, scale: 2, nullable: false),
-                    Currency = table.Column<string>(type: "text", nullable: false),
-                    PaymentStatus = table.Column<string>(type: "text", nullable: false),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Invoice", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Invoice_Subscription_SubscriptionId",
-                        column: x => x.SubscriptionId,
-                        principalTable: "Subscription",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Invoice_User_UserId",
-                        column: x => x.UserId,
-                        principalTable: "User",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SubscriptionItem",
+                name: "EventTasks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SubscriptionId = table.Column<string>(type: "text", nullable: false),
-                    ProductId = table.Column<string>(type: "text", nullable: false),
-                    PriceId = table.Column<string>(type: "text", nullable: false),
-                    PriceAmount = table.Column<decimal>(type: "numeric(8,2)", precision: 8, scale: 2, nullable: true),
-                    Currency = table.Column<string>(type: "text", nullable: false),
-                    RecurringInterval = table.Column<string>(type: "text", nullable: true),
-                    RecurringIntervalCount = table.Column<long>(type: "bigint", nullable: false),
-                    Quantity = table.Column<long>(type: "bigint", nullable: false)
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    OrganizerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubscriptionItem", x => x.Id);
+                    table.PrimaryKey("PK_EventTasks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SubscriptionItem_Subscription_SubscriptionId",
-                        column: x => x.SubscriptionId,
-                        principalTable: "Subscription",
+                        name: "FK_EventTasks_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventTasks_Organizers_OrganizerId",
+                        column: x => x.OrganizerId,
+                        principalTable: "Organizers",
+                        principalColumn: "OrganizerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Payments_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Resources",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Resources", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Resources_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tickets",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tickets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tickets_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Tickets_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoice_SubscriptionId",
-                table: "Invoice",
-                column: "SubscriptionId");
+                name: "IX_Events_OrganizerId",
+                table: "Events",
+                column: "OrganizerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Invoice_UserId",
-                table: "Invoice",
+                name: "IX_EventTasks_EventId",
+                table: "EventTasks",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventTasks_OrganizerId",
+                table: "EventTasks",
+                column: "OrganizerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_EventId",
+                table: "Payments",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_UserId",
+                table: "Payments",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProjectUsers_CreatedById",
-                table: "ProjectUsers",
-                column: "CreatedById");
+                name: "IX_Resources_EventId",
+                table: "Resources",
+                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
@@ -333,20 +362,14 @@ namespace EVM.Data.Migrations
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subscription_UserId",
-                table: "Subscription",
+                name: "IX_Tickets_EventId",
+                table: "Tickets",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tickets_UserId",
+                table: "Tickets",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionItem_PriceId_SubscriptionId_ProductId",
-                table: "SubscriptionItem",
-                columns: new[] { "PriceId", "SubscriptionId", "ProductId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SubscriptionItem_SubscriptionId",
-                table: "SubscriptionItem",
-                column: "SubscriptionId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -379,22 +402,22 @@ namespace EVM.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Invoice");
+                name: "EventTasks");
 
             migrationBuilder.DropTable(
-                name: "Payment");
-
-            migrationBuilder.DropTable(
-                name: "ProjectUsers");
+                name: "Payments");
 
             migrationBuilder.DropTable(
                 name: "RefreshToken");
 
             migrationBuilder.DropTable(
+                name: "Resources");
+
+            migrationBuilder.DropTable(
                 name: "RoleClaim");
 
             migrationBuilder.DropTable(
-                name: "SubscriptionItem");
+                name: "Tickets");
 
             migrationBuilder.DropTable(
                 name: "UserClaim");
@@ -409,13 +432,16 @@ namespace EVM.Data.Migrations
                 name: "UserToken");
 
             migrationBuilder.DropTable(
-                name: "Subscription");
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "Role");
 
             migrationBuilder.DropTable(
                 name: "User");
+
+            migrationBuilder.DropTable(
+                name: "Organizers");
         }
     }
 }

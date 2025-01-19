@@ -65,7 +65,7 @@ public static class Routes
             public static string Renew => $"{Base}/renew";
         }
     }
-    
+
     public static class RouteParam
     {
         public static string Exact(string? paramName)

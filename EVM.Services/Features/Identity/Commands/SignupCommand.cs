@@ -10,8 +10,7 @@ namespace EVM.Services.Features.Identity.Commands;
 
 public class SignupCommand(SignInManager<User> _signInManager,
     CreateUserService _createUserService,
-    AppDbContext _dbContext,
-     ClaimsService _claimsService)
+    AppDbContext _dbContext, ClaimsService _claimsService)
 {
     public async Task<ApiResponse<SignupResponse>> ExecuteAsync(SignupRequest request, CancellationToken cancellationToken = default)
     {
@@ -19,6 +18,8 @@ public class SignupCommand(SignInManager<User> _signInManager,
         {
             Email = request.Email,
             UserName = request.UserName,
+            Password = request.Password,
+            Role = Data.Enums.UserRole.None,
             Name = request.Name,
         };
 

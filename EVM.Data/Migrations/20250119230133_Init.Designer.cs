@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EVM.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241204102502_init")]
-    partial class init
+    [Migration("20250119230133_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,25 +25,83 @@ namespace EVM.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("EVM.Data.Models.IdentityFeature.ProjectUser", b =>
+            modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
                 {
-                    b.Property<Guid>("UserId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProjectId")
+                    b.Property<DateTime?>("CreatedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("FinishedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("OrganizerId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("CreatedById")
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizerId");
+
+                    b.ToTable("Events");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.EventFeature.EventTask", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Role")
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrganizerId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.HasKey("UserId", "ProjectId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("EventId");
 
-                    b.ToTable("ProjectUsers");
+                    b.HasIndex("OrganizerId");
+
+                    b.ToTable("EventTasks");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.IdentityFeature.Organizer", b =>
+                {
+                    b.Property<Guid>("OrganizerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ContactInfo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("OrganizerId");
+
+                    b.ToTable("Organizers");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.IdentityFeature.RefreshToken", b =>
@@ -142,10 +200,11 @@ namespace EVM.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("PaymentUserId")
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
@@ -153,6 +212,9 @@ namespace EVM.Data.Migrations
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("text");
@@ -176,162 +238,81 @@ namespace EVM.Data.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.Invoice", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("AmountPaid")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("numeric(8,2)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PaymentUserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SubscriptionId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubscriptionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Invoice", (string)null);
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.Payment", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("numeric");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("PaymentUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Payment", (string)null);
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.Subscription", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("CancelAtPeriodEnd")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("CanceledOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("CancelsOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("CurrentPeriodEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("CurrentPeriodStart")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PaymentUserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("UpdatedOn")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Subscription", (string)null);
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.SubscriptionItem", b =>
+            modelBuilder.Entity("EVM.Data.Models.PaymentFeature.Payment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric");
 
-                    b.Property<decimal?>("PriceAmount")
-                        .HasPrecision(8, 2)
-                        .HasColumnType("numeric(8,2)");
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("PriceId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("ProductId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("Quantity")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("RecurringInterval")
-                        .HasColumnType("text");
-
-                    b.Property<long>("RecurringIntervalCount")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("SubscriptionId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SubscriptionId");
+                    b.HasIndex("EventId");
 
-                    b.HasIndex("PriceId", "SubscriptionId", "ProductId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
-                    b.ToTable("SubscriptionItem", (string)null);
+                    b.ToTable("Payments");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.ResourceFeature.Resource", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.ToTable("Resources");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.TicketFeature.Ticket", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -437,23 +418,34 @@ namespace EVM.Data.Migrations
                     b.ToTable("UserToken", (string)null);
                 });
 
-            modelBuilder.Entity("EVM.Data.Models.IdentityFeature.ProjectUser", b =>
+            modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
                 {
-                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "CreatedBy")
+                    b.HasOne("EVM.Data.Models.IdentityFeature.Organizer", "Organizer")
                         .WithMany()
-                        .HasForeignKey("CreatedById")
+                        .HasForeignKey("OrganizerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
-                        .WithMany("Projects")
-                        .HasForeignKey("UserId")
+                    b.Navigation("Organizer");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.EventFeature.EventTask", b =>
+                {
+                    b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CreatedBy");
+                    b.HasOne("EVM.Data.Models.IdentityFeature.Organizer", "Organizer")
+                        .WithMany()
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Event");
+
+                    b.Navigation("Organizer");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.IdentityFeature.RefreshToken", b =>
@@ -467,37 +459,53 @@ namespace EVM.Data.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.Invoice", b =>
+            modelBuilder.Entity("EVM.Data.Models.PaymentFeature.Payment", b =>
                 {
-                    b.HasOne("EVM.Data.Models.PaymentsFeature.Subscription", "Subscription")
-                        .WithMany("Invoices")
-                        .HasForeignKey("SubscriptionId")
+                    b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EVM.Data.Models.IdentityFeature.User", null)
-                        .WithMany("Invoices")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Subscription");
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.Subscription", b =>
-                {
-                    b.HasOne("EVM.Data.Models.IdentityFeature.User", null)
-                        .WithMany("Subscriptions")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.SubscriptionItem", b =>
-                {
-                    b.HasOne("EVM.Data.Models.PaymentsFeature.Subscription", "Subscription")
-                        .WithMany("SubscriptionItems")
-                        .HasForeignKey("SubscriptionId")
+                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Subscription");
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.ResourceFeature.Resource", b =>
+                {
+                    b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.TicketFeature.Ticket", b =>
+                {
+                    b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -553,20 +561,7 @@ namespace EVM.Data.Migrations
 
             modelBuilder.Entity("EVM.Data.Models.IdentityFeature.User", b =>
                 {
-                    b.Navigation("Invoices");
-
-                    b.Navigation("Projects");
-
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("Subscriptions");
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.PaymentsFeature.Subscription", b =>
-                {
-                    b.Navigation("Invoices");
-
-                    b.Navigation("SubscriptionItems");
                 });
 #pragma warning restore 612, 618
         }

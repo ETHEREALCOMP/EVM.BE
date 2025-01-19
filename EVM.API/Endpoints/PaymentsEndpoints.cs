@@ -9,12 +9,12 @@ public static class PaymentsEndpoints
     public static void Register(WebApplication app)
     {
         // Payment intent (POST)
-        app.MapPost(Routes.Payment.Intent, 
+        app.MapPost(Routes.Payment.Intent,
             (/*[FromServices]*/) => Results.Ok())
             .WithTags(Tag);
 
         // Payment hook (POST)
-        app.MapPost(Routes.Payment.Hook, 
+        app.MapPost(Routes.Payment.Hook,
             (/*[FromServices]*/) => Results.Ok())
             .WithTags(Tag);
 
@@ -23,7 +23,7 @@ public static class PaymentsEndpoints
             (/*[FromServices]*/) => Results.Ok()).WithTags(Tag);
 
         // Subscription renew (POST)
-        app.MapPost(Routes.Payment.Subscription.Renew, 
+        app.MapPost(Routes.Payment.Subscription.Renew,
             (/*[FromServices]*/) => Results.Ok())
             .WithTags(Tag);
     }
