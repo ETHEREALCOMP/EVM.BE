@@ -1,10 +1,11 @@
 ﻿using EVM.Data.Enums;
 using EVM.Data.Models.EventFeature;
 using EVM.Data.Models.IdentityFeature;
+using Microsoft.EntityFrameworkCore;
 
 namespace EVM.Data.Models.PaymentFeature;
 
-public class Payment
+public class Payment : IDBConfigurableModel
 {
     public Guid Id { get; set; }
 
@@ -19,4 +20,20 @@ public class Payment
     public required Guid UserId { get; set; }
 
     public User? User { get; set; }
+
+    public static void BuildModel(ModelBuilder builder)
+    {
+        builder.Entity<Payment>()
+            .HasKey(p => p.Id);
+
+        builder.Entity<Payment>()
+            .HasOne(p => p.Event)
+            .WithMany()
+            .HasForeignKey(p => p.EventId);
+
+        builder.Entity<Payment>()
+            .HasOne(p => p.User)
+            .WithMany()
+            .HasForeignKey(p => p.UserId);
+    }
 }

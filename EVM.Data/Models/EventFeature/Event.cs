@@ -1,8 +1,11 @@
 ﻿using EVM.Data.Models.IdentityFeature;
+using EVM.Data.Models.ResourceFeature;
+using EVM.Data.Models.TicketFeature;
+using Microsoft.EntityFrameworkCore;
 
 namespace EVM.Data.Models.EventFeature;
 
-public class Event
+public class Event : IDBConfigurableModel
 {
     public Guid Id { get; set; }
 
@@ -19,4 +22,36 @@ public class Event
     public required Guid OrganizerId { get; set; }
 
     public Organizer? Organizer { get; set; }
+
+    public ICollection<Ticket> Tickets { get; set; } = [];
+
+    public ICollection<Resource> Resources { get; set; } = [];
+
+    public ICollection<EventTask> EventTasks { get; set; } = [];
+
+    public static void BuildModel(ModelBuilder builder)
+    {
+        builder.Entity<Event>()
+             .HasKey(e => e.Id);
+
+        builder.Entity<Event>()
+            .HasOne(e => e.Organizer)
+            .WithMany(o => o.Events)
+            .HasForeignKey(e => e.OrganizerId);
+
+        builder.Entity<Event>()
+            .HasMany(e => e.Tickets)
+            .WithOne(t => t.Event)
+            .HasForeignKey(t => t.EventId);
+
+        builder.Entity<Event>()
+            .HasMany(e => e.Resources)
+            .WithOne(r => r.Event)
+            .HasForeignKey(r => r.EventId);
+
+        builder.Entity<Event>()
+            .HasMany(e => e.EventTasks)
+            .WithOne(t => t.Event)
+            .HasForeignKey(t => t.EventId);
+    }
 }
