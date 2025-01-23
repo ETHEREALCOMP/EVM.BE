@@ -1,4 +1,5 @@
 ﻿using EVM.Data.Enums;
+using EVM.Data.Models.EventFeature;
 using EVM.Data.Models.TicketFeature;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,8 @@ public class User : IdentityUser<Guid>, IDBConfigurableModel
     public virtual List<RefreshToken> RefreshTokens { get; set; } = [];
 
     public virtual ICollection<Ticket> Tickets { get; set; } = [];
+
+    public ICollection<Event> Events { get; set; } = [];
 
     public static void BuildModel(ModelBuilder builder)
     {

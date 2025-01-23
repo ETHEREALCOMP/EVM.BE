@@ -41,16 +41,16 @@ namespace EVM.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("OrganizerId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("OrganizerId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Events");
                 });
@@ -67,9 +67,6 @@ namespace EVM.Data.Migrations
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("OrganizerId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -77,28 +74,7 @@ namespace EVM.Data.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.HasIndex("OrganizerId");
-
                     b.ToTable("EventTasks");
-                });
-
-            modelBuilder.Entity("EVM.Data.Models.IdentityFeature.Organizer", b =>
-                {
-                    b.Property<Guid>("OrganizerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("ContactInfo")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("OrganizerId");
-
-                    b.ToTable("Organizers");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.IdentityFeature.RefreshToken", b =>
@@ -417,32 +393,20 @@ namespace EVM.Data.Migrations
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
                 {
-                    b.HasOne("EVM.Data.Models.IdentityFeature.Organizer", "Organizer")
-                        .WithMany()
-                        .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organizer");
+                    b.HasOne("EVM.Data.Models.IdentityFeature.User", null)
+                        .WithMany("Events")
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.EventTask", b =>
                 {
                     b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
-                        .WithMany()
+                        .WithMany("EventTasks")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EVM.Data.Models.IdentityFeature.Organizer", "Organizer")
-                        .WithMany()
-                        .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Event");
-
-                    b.Navigation("Organizer");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.IdentityFeature.RefreshToken", b =>
@@ -478,7 +442,7 @@ namespace EVM.Data.Migrations
             modelBuilder.Entity("EVM.Data.Models.ResourceFeature.Resource", b =>
                 {
                     b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
-                        .WithMany()
+                        .WithMany("Resources")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -489,13 +453,13 @@ namespace EVM.Data.Migrations
             modelBuilder.Entity("EVM.Data.Models.TicketFeature.Ticket", b =>
                 {
                     b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
-                        .WithMany()
+                        .WithMany("Tickets")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
-                        .WithMany()
+                        .WithMany("Tickets")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -556,9 +520,22 @@ namespace EVM.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
+                {
+                    b.Navigation("EventTasks");
+
+                    b.Navigation("Resources");
+
+                    b.Navigation("Tickets");
+                });
+
             modelBuilder.Entity("EVM.Data.Models.IdentityFeature.User", b =>
                 {
+                    b.Navigation("Events");
+
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }

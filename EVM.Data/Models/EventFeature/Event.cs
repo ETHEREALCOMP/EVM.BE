@@ -19,25 +19,25 @@ public class Event : IDBConfigurableModel
 
     public required string Location { get; set; } // later add Map for localization
 
-    public required Guid OrganizerId { get; set; }
+    //public required Guid UserId { get; set; }
 
-    public Organizer? Organizer { get; set; }
+    //public User? User { get; set; }
 
-    public ICollection<Ticket> Tickets { get; set; } = [];
+    public virtual ICollection<Ticket> Tickets { get; set; } = [];
 
-    public ICollection<Resource> Resources { get; set; } = [];
+    public virtual ICollection<Resource> Resources { get; set; } = [];
 
-    public ICollection<EventTask> EventTasks { get; set; } = [];
+    public virtual ICollection<EventTask> EventTasks { get; set; } = [];
 
     public static void BuildModel(ModelBuilder builder)
     {
         builder.Entity<Event>()
              .HasKey(e => e.Id);
 
-        builder.Entity<Event>()
-            .HasOne(e => e.Organizer)
-            .WithMany(o => o.Events)
-            .HasForeignKey(e => e.OrganizerId);
+        //builder.Entity<Event>()
+        //    .HasOne(e => e.User)
+        //    .WithMany(o => o.Events)
+        //    .HasForeignKey(e => e.UserId);
 
         builder.Entity<Event>()
             .HasMany(e => e.Tickets)

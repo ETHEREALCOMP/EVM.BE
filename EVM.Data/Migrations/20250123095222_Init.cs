@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -11,19 +12,6 @@ namespace EVM.Data.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Organizers",
-                columns: table => new
-                {
-                    OrganizerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    ContactInfo = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Organizers", x => x.OrganizerId);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Role",
                 columns: table => new
@@ -67,29 +55,6 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Events",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: true),
-                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    FinishedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Location = table.Column<string>(type: "text", nullable: false),
-                    OrganizerId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Events", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Events_Organizers_OrganizerId",
-                        column: x => x.OrganizerId,
-                        principalTable: "Organizers",
-                        principalColumn: "OrganizerId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RoleClaim",
                 columns: table => new
                 {
@@ -108,6 +73,28 @@ namespace EVM.Data.Migrations
                         principalTable: "Role",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    FinishedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Location = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Events_User_UserId",
+                        column: x => x.UserId,
+                        principalTable: "User",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -225,7 +212,6 @@ namespace EVM.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
-                    OrganizerId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     EventId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
@@ -237,12 +223,6 @@ namespace EVM.Data.Migrations
                         column: x => x.EventId,
                         principalTable: "Events",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EventTasks_Organizers_OrganizerId",
-                        column: x => x.OrganizerId,
-                        principalTable: "Organizers",
-                        principalColumn: "OrganizerId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -321,19 +301,14 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_OrganizerId",
+                name: "IX_Events_UserId",
                 table: "Events",
-                column: "OrganizerId");
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_EventTasks_EventId",
                 table: "EventTasks",
                 column: "EventId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EventTasks_OrganizerId",
-                table: "EventTasks",
-                column: "OrganizerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_EventId",
@@ -439,9 +414,6 @@ namespace EVM.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "User");
-
-            migrationBuilder.DropTable(
-                name: "Organizers");
         }
     }
 }

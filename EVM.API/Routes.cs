@@ -25,25 +25,9 @@ public static class Routes
         public static string Reset => $"{Base}/reset";
     }
 
-    public static class Projects
+    public static class Event
     {
-        public static string Base => "project";
-
-        public static string Exact(string projectId) => Base + RouteParam.Exact(projectId);
-    }
-
-    public static class Environment
-    {
-        public static string Base => "environments";
-
-        public static string CreateEnv => $"{Base}/create";
-
-        public static string Exact(string paramName) => Base + RouteParam.Exact(paramName);
-    }
-
-    public static class EnvironmentVariable
-    {
-        public static string Base => "environment-variables";
+        public static string Base => "event";
 
         public static string Exact(string paramName) => Base + RouteParam.Exact(paramName);
     }

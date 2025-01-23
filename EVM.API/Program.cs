@@ -3,7 +3,6 @@ using EVM.API.Extensions;
 using EVM.API.Middleware;
 using EVM.Data;
 using EVM.Services;
-using EVM.Services.Features.Identity;
 using Microsoft.AspNetCore.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -34,11 +33,9 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 // Add authorization services
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
 
 Database.Register(builder.Services, builder.Configuration);
-IdentityModule.Register(builder.Services, builder.Configuration);
-
 ServicesModule.Register(builder.Services, builder.Configuration);
 
 var app = builder.Build();
@@ -63,9 +60,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
     app.UseSwaggerUI();
 }
 
-app.UseAuthentication();
+//app.UseAuthentication();
 
-app.UseAuthorization();
+//app.UseAuthorization();
 
 EndpointsModule.Register(app);
 

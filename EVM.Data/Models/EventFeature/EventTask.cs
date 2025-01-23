@@ -9,9 +9,9 @@ public class EventTask : IDBConfigurableModel
 
     public string? Description { get; set; }
 
-    public required Guid OrganizerId { get; set; }
+    //public required Guid UserId { get; set; }
 
-    public Organizer? Organizer { get; set; }
+    //public User? User { get; set; }
 
     public required TaskStatus Status { get; set; }
 

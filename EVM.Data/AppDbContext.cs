@@ -16,8 +16,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> _options)
 {
     public DbSet<Event> Events { get; set; }
 
-    public DbSet<Organizer> Organizers { get; set; }
-
     public DbSet<Resource> Resources { get; set; }
 
     public DbSet<Ticket> Tickets { get; set; }

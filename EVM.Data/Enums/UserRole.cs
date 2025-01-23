@@ -5,9 +5,9 @@ public enum UserRole
 {
     None = 0,
 
-    Organizer = 1 << 1,
+    Gues = 1,
 
-    Gues = 1 << 2,
+    Organizer = 2,
 
     Admin = Gues | Organizer,
 }
