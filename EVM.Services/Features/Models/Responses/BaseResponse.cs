@@ -1,4 +1,4 @@
-﻿namespace EVM.Services.Features.Event.Models.Responses;
+﻿namespace EVM.Services.Features.Models.Responses;
 
 public class BaseResponse
 {

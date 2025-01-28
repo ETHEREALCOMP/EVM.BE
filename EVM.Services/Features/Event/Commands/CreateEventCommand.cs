@@ -2,7 +2,6 @@
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
-using EVM.Services.Features.Event.Models.Responses;
 using EVM.Services.Features.Models.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
