@@ -19,9 +19,9 @@ public class Event : IDBConfigurableModel
 
     public required string Location { get; set; } // later add Map for localization
 
-    //public required Guid UserId { get; set; }
+    public required Guid UserId { get; set; }
 
-    //public User? User { get; set; }
+    public User? User { get; set; }
 
     public virtual ICollection<Ticket> Tickets { get; set; } = [];
 
@@ -34,10 +34,10 @@ public class Event : IDBConfigurableModel
         builder.Entity<Event>()
              .HasKey(e => e.Id);
 
-        //builder.Entity<Event>()
-        //    .HasOne(e => e.User)
-        //    .WithMany(o => o.Events)
-        //    .HasForeignKey(e => e.UserId);
+        builder.Entity<Event>()
+            .HasOne(e => e.User)
+            .WithMany(o => o.Events)
+            .HasForeignKey(e => e.UserId);
 
         builder.Entity<Event>()
             .HasMany(e => e.Tickets)

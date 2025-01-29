@@ -15,6 +15,11 @@ public class CreateUserService(AppDbContext _dbContext, UserManager<User> _userM
         {
             var result = await (password is null ? _userManager.CreateAsync(newUser) : _userManager.CreateAsync(newUser, password));
 
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
         }

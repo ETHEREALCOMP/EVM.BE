@@ -14,7 +14,7 @@ public class EventEndpoints
             ([FromServices] CreateEventCommand command,
             [FromBody] CreateEventRequest request,
             CancellationToken cancellationToken) => command.ExecuteAsync(request, cancellationToken))
-            .AllowAnonymous()
+            .RequireAuthorization()
             .WithTags(Tag);
     }
 }

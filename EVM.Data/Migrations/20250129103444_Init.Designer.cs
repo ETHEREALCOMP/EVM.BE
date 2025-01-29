@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EVM.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250123095222_Init")]
+    [Migration("20250129103444_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -48,7 +48,7 @@ namespace EVM.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -211,7 +211,7 @@ namespace EVM.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("EVM.Data.Models.PaymentFeature.Payment", b =>
@@ -396,9 +396,13 @@ namespace EVM.Data.Migrations
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
                 {
-                    b.HasOne("EVM.Data.Models.IdentityFeature.User", null)
+                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
                         .WithMany("Events")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.EventTask", b =>
