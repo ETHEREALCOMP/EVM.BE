@@ -45,7 +45,7 @@ namespace EVM.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
+                    b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
@@ -208,7 +208,7 @@ namespace EVM.Data.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("AspNetUsers", (string)null);
                 });
 
             modelBuilder.Entity("EVM.Data.Models.PaymentFeature.Payment", b =>
@@ -393,9 +393,13 @@ namespace EVM.Data.Migrations
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
                 {
-                    b.HasOne("EVM.Data.Models.IdentityFeature.User", null)
+                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
                         .WithMany("Events")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.EventTask", b =>

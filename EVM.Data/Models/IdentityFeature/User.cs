@@ -22,15 +22,15 @@ public class User : IdentityUser<Guid>, IDBConfigurableModel
 
     public static void BuildModel(ModelBuilder builder)
     {
-        builder.Entity<User>()
-            .ToTable(nameof(User));
-
-        builder.Entity<User>()
-            .HasKey(x => x.Id);
-
-        builder.Entity<User>()
-           .HasMany(u => u.Tickets)
-           .WithOne(t => t.User)
-           .HasForeignKey(t => t.UserId);
+        builder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired();
+            entity.Property(e => e.Password).IsRequired();
+            entity.Property(e => e.Role).IsRequired();
+            entity.HasMany(e => e.RefreshTokens).WithOne(rt => rt.Owner).HasForeignKey(rt => rt.OwnerId);
+            entity.HasMany(e => e.Tickets).WithOne(t => t.User).HasForeignKey(t => t.UserId);
+            entity.HasMany(e => e.Events).WithOne(e => e.User).HasForeignKey(e => e.UserId);
+        });
     }
 }

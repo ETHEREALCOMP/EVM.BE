@@ -2,7 +2,6 @@
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
-using EVM.Services.Features.Event.Models.Responses;
 using EVM.Services.Features.Models.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ public class CreateEventCommand(ILogger<CreateEventCommand> _logger, AppDbContex
 
     public async Task<ApiResponse<BaseResponse>> ExecuteAsync(CreateEventRequest request, CancellationToken cancellationToken = default)
     {
-        //var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+        var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
         try
         {
@@ -26,6 +25,7 @@ public class CreateEventCommand(ILogger<CreateEventCommand> _logger, AppDbContex
                 Description = request.Description,
                 Location = request.Location,
                 CreatedOn = DateTime.UtcNow,
+                UserId = userId,
             };
 
             _appDbContext.Events.Add(newEvent);
