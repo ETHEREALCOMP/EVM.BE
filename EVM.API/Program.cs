@@ -17,20 +17,16 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddCors(options =>
-    {
-        options.AddDefaultPolicy(
-            builder =>
-            {
-                builder.AllowAnyHeader();
-                builder.AllowAnyMethod();
-                builder.AllowCredentials();
-                builder.WithOrigins("https://localhost:3000");
-            });
-    });
+{
+    options.AddPolicy("AllowLocalhost", policy =>
+        policy.WithOrigins("http://localhost:3000", "http://localhost:3001")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials());
+});
 
 builder.Services.Configure<JsonOptions>(options =>
 {
@@ -49,6 +45,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -65,7 +62,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuer = false,
         ValidateAudience = false,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.FromMinutes(5),
     };
 });
 
@@ -75,16 +72,8 @@ ServicesModule.Register(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
+app.UseCors("AllowLocalhost");
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
-app.UseCors(o =>
-{
-    o.AllowAnyHeader();
-    o.AllowAnyMethod();
-    o.WithOrigins("https://localhost:3000", "https://localhost:3001");
-    o.AllowCredentials();
-    o.SetPreflightMaxAge(TimeSpan.FromDays(1));
-});
 
 app.UseHsts();
 
@@ -96,7 +85,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
 }
 
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 EndpointsModule.Register(app);
