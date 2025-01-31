@@ -212,13 +212,21 @@ namespace EVM.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     EventId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventTasks_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EventTasks_Events_EventId",
                         column: x => x.EventId,
@@ -321,6 +329,11 @@ namespace EVM.Data.Migrations
                 name: "IX_EventTasks_EventId",
                 table: "EventTasks",
                 column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventTasks_UserId",
+                table: "EventTasks",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Payments_EventId",

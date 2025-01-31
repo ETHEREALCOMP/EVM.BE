@@ -7,13 +7,15 @@ public class EventTask : IDBConfigurableModel
 {
     public Guid Id { get; set; }
 
+    public required string Title { get; set; }
+
     public string? Description { get; set; }
 
-    //public required Guid UserId { get; set; }
+    public required Guid UserId { get; set; }
 
-    //public User? User { get; set; }
+    public User? User { get; set; }
 
-    public required TaskStatus Status { get; set; }
+    public required Enums.TaskStatus Status { get; set; }
 
     public required Guid EventId { get; set; }
 

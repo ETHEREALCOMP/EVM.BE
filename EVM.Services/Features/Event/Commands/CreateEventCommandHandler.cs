@@ -1,17 +1,19 @@
 ﻿using EVM.Data;
+using EVM.Data.Enums;
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
 using EVM.Services.Features.Models.Responses;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
 namespace EVM.Services.Features.Event.Commands;
 
-public class CreateEventCommand
-    (ILogger<CreateEventCommand> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor)
+public class CreateEventCommandHandler
+    (ILogger<CreateEventCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor)
     : IRequestHandler<CreateEventRequest, ApiResponse<BaseResponse>>
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
@@ -22,6 +24,16 @@ public class CreateEventCommand
 
         try
         {
+            var user = await _appDbContext.Users
+                .Where(x => x.Id == userId)
+                .FirstOrDefaultAsync(cancellationToken)
+                ?? throw new UserNotFoundException();
+
+            if (user.Role != UserRole.Organizer)
+            {
+                user.Role = UserRole.Organizer;
+            }
+
             var newEvent = new Data.Models.EventFeature.Event
             {
                 Title = request.Title,

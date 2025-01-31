@@ -13,16 +13,16 @@ public static class IdentityEndpoints
     public static void Register(WebApplication app)
     {
         app.MapPost(Routes.Identity.Signin,
-            ([FromServices] LoginCommand command,
+            ([FromServices] LoginCommandHandler commandHandler,
             [FromBody] LoginRequest request,
-            CancellationToken cancellationToken) => command.Handle(request, cancellationToken))
+            CancellationToken cancellationToken) => commandHandler.Handle(request, cancellationToken))
             .AllowAnonymous()
             .WithTags(Tag);
 
         app.MapPost(Routes.Identity.Signup,
-           ([FromServices] RegisterCommand command,
+           ([FromServices] RegisterCommandHandler commandHandler,
            [FromBody] RegisterRequest request,
-           CancellationToken cancellationToken) => command.Handle(request, cancellationToken))
+           CancellationToken cancellationToken) => commandHandler.Handle(request, cancellationToken))
            .AllowAnonymous()
            .WithTags(Tag);
     }
