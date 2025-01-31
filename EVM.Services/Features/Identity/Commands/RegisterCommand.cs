@@ -4,12 +4,11 @@ using EVM.Services.Features.Identity.Models.Requests;
 using EVM.Services.Features.Models.Responses;
 using EVM.Services.Service;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 
 namespace EVM.Services.Features.Identity.Commands;
 
-public class RegisterCommand(CreateUserService _createUserService, AppDbContext _appDbContext) : IRequestHandler<RegisterRequest, ApiResponse<BaseResponse>>
+public class RegisterCommand(CreateUserService _createUserService, AppDbContext _appDbContext) 
+    : IRequestHandler<RegisterRequest, ApiResponse<BaseResponse>>
 {
     public async Task<ApiResponse<BaseResponse>> Handle(RegisterRequest request, CancellationToken cancellationToken)
     {

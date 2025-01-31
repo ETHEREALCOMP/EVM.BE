@@ -4,4 +4,9 @@ using MediatR;
 
 namespace EVM.Services.Features.Identity.Models.Requests;
 
-public record LoginRequest(string Email, string Password) : IRequest<ApiResponse<BaseAuthResponse>>;
+public record LoginRequest : IRequest<ApiResponse<BaseAuthResponse>>
+{
+    public required string Email { get; set; }
+
+    public required string Password { get; set; }
+}

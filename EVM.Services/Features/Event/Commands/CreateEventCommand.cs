@@ -3,17 +3,20 @@ using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
 using EVM.Services.Features.Models.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
 namespace EVM.Services.Features.Event.Commands;
 
-public class CreateEventCommand(ILogger<CreateEventCommand> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor)
+public class CreateEventCommand
+    (ILogger<CreateEventCommand> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor)
+    : IRequestHandler<CreateEventRequest, ApiResponse<BaseResponse>>
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
-    public async Task<ApiResponse<BaseResponse>> ExecuteAsync(CreateEventRequest request, CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<BaseResponse>> Handle(CreateEventRequest request, CancellationToken cancellationToken)
     {
         var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
@@ -32,12 +35,12 @@ public class CreateEventCommand(ILogger<CreateEventCommand> _logger, AppDbContex
             await _appDbContext.SaveChangesAsync(cancellationToken);
 
             _logger.LogInformation("Event created successfully with ID: {EventId}", newEvent.Id);
-            return new (new() { Id = newEvent.Id });
+            return new(new() { Id = newEvent.Id });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred while creating event.");
-            return new (HttpStatusCode.InternalServerError, "An error occurred while creating the event.");
+            return new(HttpStatusCode.InternalServerError, "An error occurred while creating the event.");
         }
     }
 }

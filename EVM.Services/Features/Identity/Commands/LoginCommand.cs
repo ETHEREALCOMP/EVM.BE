@@ -9,7 +9,8 @@ using System.Net;
 
 namespace EVM.Services.Features.Identity.Commands;
 
-public class LoginCommand(UserManager<User> _userManager, SignInManager<User> _signInManager, ClaimsService _claimsService, JwtService _jwtService) : IRequestHandler<LoginRequest, ApiResponse<BaseAuthResponse>>
+public class LoginCommand(UserManager<User> _userManager, SignInManager<User> _signInManager, ClaimsService _claimsService, JwtService _jwtService)
+    : IRequestHandler<LoginRequest, ApiResponse<BaseAuthResponse>>
 {
     public async Task<ApiResponse<BaseAuthResponse>> Handle(LoginRequest request, CancellationToken cancellationToken)
     {
