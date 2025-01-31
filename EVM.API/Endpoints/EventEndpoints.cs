@@ -11,9 +11,16 @@ public class EventEndpoints
     public static void Register(WebApplication app)
     {
         app.MapPost(Routes.Event.Base,
-            ([FromServices] CreateEventCommand command,
+            ([FromServices] CreateEventCommandHandler commandHandler,
             [FromBody] CreateEventRequest request,
-            CancellationToken cancellationToken) => command.ExecuteAsync(request, cancellationToken))
+            CancellationToken cancellationToken) => commandHandler.Handle(request, cancellationToken))
+            .RequireAuthorization()
+            .WithTags(Tag);
+
+        app.MapPost(Routes.Event.EventTask.Base,
+            ([FromServices] CreateEventTasksCommandHandler commandHandler,
+            [FromBody] CreateEventTaskRequest request,
+            CancellationToken cancellationToken) => commandHandler.Handle(request, cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
     }

@@ -7,7 +7,7 @@ using MediatR;
 
 namespace EVM.Services.Features.Identity.Commands;
 
-public class RegisterCommand(CreateUserService _createUserService, AppDbContext _appDbContext) 
+public class RegisterCommandHandler(CreateUserService _createUserService, AppDbContext _appDbContext) 
     : IRequestHandler<RegisterRequest, ApiResponse<BaseResponse>>
 {
     public async Task<ApiResponse<BaseResponse>> Handle(RegisterRequest request, CancellationToken cancellationToken)

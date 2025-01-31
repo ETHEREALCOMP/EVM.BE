@@ -30,6 +30,13 @@ public static class Routes
         public static string Base => "event";
 
         public static string Exact(string paramName) => Base + RouteParam.Exact(paramName);
+
+        public static class EventTask
+        {
+            public static string Base => $"{Event.Base}/task";
+
+            public static string Exact(string paramName) => Base + RouteParam.Exact(paramName);
+        }
     }
 
     public static class Payment

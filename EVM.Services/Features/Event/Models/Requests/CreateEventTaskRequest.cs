@@ -1,10 +1,13 @@
-﻿namespace EVM.Services.Features.Event.Models.Requests;
+﻿using EVM.Services.Features.Models.Responses;
+using MediatR;
 
-public class CreateEventTaskRequest
+namespace EVM.Services.Features.Event.Models.Requests;
+
+public record CreateEventTaskRequest : IRequest<ApiResponse<BaseResponse>>
 {
-    public string? Description { get; set; }
+    public required string Title { get; set; }
 
-    public required TaskStatus Status { get; set; }
+    public string? Description { get; set; }
 
     public required Guid EventId { get; set; }
 }

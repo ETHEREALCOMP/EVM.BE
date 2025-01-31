@@ -7,6 +7,7 @@ public class EventModule
 {
     public static void Register(IServiceCollection services)
     {
-        services.AddScoped<CreateEventCommand>();
+        services.AddScoped<CreateEventCommandHandler>();
+        services.AddScoped<CreateEventTasksCommandHandler>();
     }
 }

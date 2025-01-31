@@ -27,8 +27,8 @@ public class IdentityModule
 
     private static IServiceCollection RegisterCommands(IServiceCollection services)
     {
-        services.AddScoped<RegisterCommand>();
-        services.AddScoped<LoginCommand>();
+        services.AddScoped<RegisterCommandHandler>();
+        services.AddScoped<LoginCommandHandler>();
 
         return services;
     }

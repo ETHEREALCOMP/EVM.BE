@@ -1,4 +1,5 @@
-﻿using EVM.Data.Models.IdentityFeature;
+﻿using EVM.Data.Enums;
+using EVM.Data.Models.IdentityFeature;
 using EVM.Data.Models.ResourceFeature;
 using EVM.Data.Models.TicketFeature;
 using Microsoft.EntityFrameworkCore;
