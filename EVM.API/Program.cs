@@ -63,8 +63,12 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = false,
         ValidateLifetime = true,
         ClockSkew = TimeSpan.FromMinutes(5),
+        NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier",
+        RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
     };
 });
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthorization();
 
 IdentityModule.Register(builder.Services, builder.Configuration);
 Database.Register(builder.Services, builder.Configuration);

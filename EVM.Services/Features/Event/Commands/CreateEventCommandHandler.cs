@@ -20,12 +20,12 @@ public class CreateEventCommandHandler
 
     public async Task<ApiResponse<BaseResponse>> Handle(CreateEventRequest request, CancellationToken cancellationToken)
     {
-        var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+       // var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
         try
         {
             var user = await _appDbContext.Users
-                .Where(x => x.Id == userId)
+                .Where(x => x.Id == request.userId)
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new UserNotFoundException();
 
@@ -40,7 +40,7 @@ public class CreateEventCommandHandler
                 Description = request.Description,
                 Location = request.Location,
                 CreatedOn = DateTime.UtcNow,
-                UserId = userId,
+                UserId = request.userId,
             };
 
             _appDbContext.Events.Add(newEvent);

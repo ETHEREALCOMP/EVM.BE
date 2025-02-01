@@ -20,7 +20,7 @@ public class CreateEventTasksCommandHandler
 
     public async Task<ApiResponse<BaseResponse>> Handle(CreateEventTaskRequest request, CancellationToken cancellationToken)
     {
-        var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+        //var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
         var eventEntity = await _appDbContext.Events
         .Include(e => e.EventTasks)
@@ -32,7 +32,7 @@ public class CreateEventTasksCommandHandler
             EventId = request.EventId,
             Title = request.Title,
             Description = request.Description,
-            UserId = userId,
+            UserId = request.UserId,
             Status = Data.Enums.TaskStatus.NotStarted,
         };
 

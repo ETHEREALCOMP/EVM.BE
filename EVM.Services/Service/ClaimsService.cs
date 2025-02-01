@@ -10,8 +10,9 @@ public class ClaimsService(AppDbContext _dbContext)
     {
         var claims = new List<Claim>()
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Name),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
         };
 
         return claims;
