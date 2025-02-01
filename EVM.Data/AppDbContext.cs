@@ -24,6 +24,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> _options)
 
     public DbSet<EventTask> EventTasks { get; set; }
 
+    public DbSet<EventResource> EventResources { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

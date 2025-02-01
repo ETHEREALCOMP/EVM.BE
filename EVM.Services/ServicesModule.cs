@@ -1,4 +1,5 @@
 ﻿using EVM.Services.Features.Event;
+using EVM.Services.Features.Resourse;
 using EVM.Services.Service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,5 +14,6 @@ public static class ServicesModule
         services.AddScoped<JwtService>();
         services.AddScoped<CustomClaimsValidator>();
         EventModule.Register(services);
+        ResourceModule.Register(services, configuration);
     }
 }

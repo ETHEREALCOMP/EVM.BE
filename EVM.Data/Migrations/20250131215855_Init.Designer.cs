@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EVM.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250131124652_Init")]
+    [Migration("20250131215855_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -250,13 +250,25 @@ namespace EVM.Data.Migrations
                     b.ToTable("Payments");
                 });
 
+            modelBuilder.Entity("EVM.Data.Models.ResourceFeature.EventResource", b =>
+                {
+                    b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ResourceId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("EventId", "ResourceId");
+
+                    b.HasIndex("ResourceId");
+
+                    b.ToTable("EventResources");
+                });
+
             modelBuilder.Entity("EVM.Data.Models.ResourceFeature.Resource", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("EventId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Name")
@@ -267,8 +279,6 @@ namespace EVM.Data.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("EventId");
 
                     b.ToTable("Resources");
                 });
@@ -463,15 +473,23 @@ namespace EVM.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("EVM.Data.Models.ResourceFeature.Resource", b =>
+            modelBuilder.Entity("EVM.Data.Models.ResourceFeature.EventResource", b =>
                 {
                     b.HasOne("EVM.Data.Models.EventFeature.Event", "Event")
-                        .WithMany("Resources")
+                        .WithMany("EventResources")
                         .HasForeignKey("EventId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EVM.Data.Models.ResourceFeature.Resource", "Resource")
+                        .WithMany("EventResources")
+                        .HasForeignKey("ResourceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Event");
+
+                    b.Navigation("Resource");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.TicketFeature.Ticket", b =>
@@ -546,9 +564,9 @@ namespace EVM.Data.Migrations
 
             modelBuilder.Entity("EVM.Data.Models.EventFeature.Event", b =>
                 {
-                    b.Navigation("EventTasks");
+                    b.Navigation("EventResources");
 
-                    b.Navigation("Resources");
+                    b.Navigation("EventTasks");
 
                     b.Navigation("Tickets");
                 });
@@ -560,6 +578,11 @@ namespace EVM.Data.Migrations
                     b.Navigation("RefreshTokens");
 
                     b.Navigation("Tickets");
+                });
+
+            modelBuilder.Entity("EVM.Data.Models.ResourceFeature.Resource", b =>
+                {
+                    b.Navigation("EventResources");
                 });
 #pragma warning restore 612, 618
         }

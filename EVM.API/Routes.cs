@@ -39,6 +39,13 @@ public static class Routes
         }
     }
 
+    public static class Resource
+    {
+        public static string Base => "resource";
+
+        public static string Exact(string paramName) => Base + RouteParam.Exact(paramName);
+    }
+
     public static class Payment
     {
         public static string Base => "pay";

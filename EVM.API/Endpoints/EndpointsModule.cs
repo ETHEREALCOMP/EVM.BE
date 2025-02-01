@@ -8,5 +8,6 @@ public static class EndpointsModule
         UsersEndpoints.Register(app);
         PaymentsEndpoints.Register(app);
         EventEndpoints.Register(app);
+        ResourceEndpoints.Register(app);
     }
 }

@@ -24,16 +24,16 @@ public class Event : IDBConfigurableModel
 
     public User? User { get; set; }
 
-    public virtual ICollection<Ticket> Tickets { get; set; } = [];
+    public virtual ICollection<EventResource> EventResources { get; set; } = [];
 
-    public virtual ICollection<Resource> Resources { get; set; } = [];
+    public virtual ICollection<Ticket> Tickets { get; set; } = [];
 
     public virtual ICollection<EventTask> EventTasks { get; set; } = [];
 
     public static void BuildModel(ModelBuilder builder)
     {
         builder.Entity<Event>()
-             .HasKey(e => e.Id);
+                 .HasKey(e => e.Id);
 
         builder.Entity<Event>()
             .HasOne(e => e.User)
@@ -46,9 +46,9 @@ public class Event : IDBConfigurableModel
             .HasForeignKey(t => t.EventId);
 
         builder.Entity<Event>()
-            .HasMany(e => e.Resources)
-            .WithOne(r => r.Event)
-            .HasForeignKey(r => r.EventId);
+            .HasMany(e => e.EventResources)
+            .WithOne(er => er.Event)
+            .HasForeignKey(er => er.EventId);
 
         builder.Entity<Event>()
             .HasMany(e => e.EventTasks)

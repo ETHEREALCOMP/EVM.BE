@@ -41,6 +41,19 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Resources",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Resources", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Role",
                 columns: table => new
                 {
@@ -208,6 +221,30 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EventResources",
+                columns: table => new
+                {
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ResourceId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventResources", x => new { x.EventId, x.ResourceId });
+                    table.ForeignKey(
+                        name: "FK_EventResources_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventResources_Resources_ResourceId",
+                        column: x => x.ResourceId,
+                        principalTable: "Resources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "EventTasks",
                 columns: table => new
                 {
@@ -263,26 +300,6 @@ namespace EVM.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Resources",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    EventId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Resources", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Resources_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Tickets",
                 columns: table => new
                 {
@@ -321,6 +338,11 @@ namespace EVM.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventResources_ResourceId",
+                table: "EventResources",
+                column: "ResourceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_UserId",
                 table: "Events",
                 column: "UserId");
@@ -344,11 +366,6 @@ namespace EVM.Data.Migrations
                 name: "IX_Payments_UserId",
                 table: "Payments",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Resources_EventId",
-                table: "Resources",
-                column: "EventId");
 
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
@@ -391,6 +408,9 @@ namespace EVM.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "EventResources");
+
+            migrationBuilder.DropTable(
                 name: "EventTasks");
 
             migrationBuilder.DropTable(
@@ -398,9 +418,6 @@ namespace EVM.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "RefreshToken");
-
-            migrationBuilder.DropTable(
-                name: "Resources");
 
             migrationBuilder.DropTable(
                 name: "RoleClaim");
@@ -419,6 +436,9 @@ namespace EVM.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserToken");
+
+            migrationBuilder.DropTable(
+                name: "Resources");
 
             migrationBuilder.DropTable(
                 name: "Events");
