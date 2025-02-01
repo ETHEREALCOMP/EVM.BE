@@ -25,7 +25,7 @@ public class CreateEventCommandHandler
         try
         {
             var user = await _appDbContext.Users
-                .Where(x => x.Id == request.userId)
+                .Where(x => x.Id == request.UserId)
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new UserNotFoundException();
 
@@ -40,7 +40,7 @@ public class CreateEventCommandHandler
                 Description = request.Description,
                 Location = request.Location,
                 CreatedOn = DateTime.UtcNow,
-                UserId = request.userId,
+                UserId = request.UserId,
             };
 
             _appDbContext.Events.Add(newEvent);
