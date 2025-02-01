@@ -19,12 +19,13 @@ public class CreateResourceCommandHandler
 
     public async Task<ApiResponse<CreateResourcesResponse>> Handle(CreateResourceRequest request, CancellationToken cancellationToken)
     {
-        var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+        //var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
         var resources = request.Resources.Select(x => (Resource)x).ToList();
 
         var eventResources = resources.Select(x => new EventResource
         {
+            UserId = request.UserId,
             EventId = request.EventId,
             ResourceId = x.Id,
         }).ToList();
