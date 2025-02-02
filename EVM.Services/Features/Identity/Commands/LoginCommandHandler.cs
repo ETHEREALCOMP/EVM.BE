@@ -20,7 +20,7 @@ public class LoginCommandHandler(UserManager<User> _userManager, SignInManager<U
             return new(HttpStatusCode.Unauthorized, "Invalid credentials");
         }
 
-        var loginResult = await _signInManager.CheckPasswordSignInAsync(user, request.Password, true);
+        var loginResult = await _signInManager.PasswordSignInAsync(user, request.Password, true, false);
 
         if (loginResult.Succeeded)
         {

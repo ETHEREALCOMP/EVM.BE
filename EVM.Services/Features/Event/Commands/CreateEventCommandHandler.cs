@@ -4,6 +4,7 @@ using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
 using EVM.Services.Features.Models.Responses;
+using EVM.Services.Service;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -13,26 +14,24 @@ using System.Net;
 namespace EVM.Services.Features.Event.Commands;
 
 public class CreateEventCommandHandler
-    (ILogger<CreateEventCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor)
+    (ILogger<CreateEventCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, CustomClaimsValidator _customClaimsValidator)
     : IRequestHandler<CreateEventRequest, ApiResponse<BaseResponse>>
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
     public async Task<ApiResponse<BaseResponse>> Handle(CreateEventRequest request, CancellationToken cancellationToken)
     {
-       // var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+        await _customClaimsValidator.ValidateClaims();
+
+        var userId = _httpContext.User?.GetId()
+            ?? throw new UserNotFoundException();
 
         try
         {
             var user = await _appDbContext.Users
-                .Where(x => x.Id == request.UserId)
+                .Where(x => x.Id == userId)
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new UserNotFoundException();
-
-            if (user.Role != UserRole.Organizer)
-            {
-                user.Role = UserRole.Organizer;
-            }
 
             var newEvent = new Data.Models.EventFeature.Event
             {
@@ -40,7 +39,7 @@ public class CreateEventCommandHandler
                 Description = request.Description,
                 Location = request.Location,
                 CreatedOn = DateTime.UtcNow,
-                UserId = request.UserId,
+                UserId = userId,
             };
 
             _appDbContext.Events.Add(newEvent);
@@ -56,3 +55,4 @@ public class CreateEventCommandHandler
         }
     }
 }
+
