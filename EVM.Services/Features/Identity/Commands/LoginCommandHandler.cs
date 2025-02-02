@@ -25,7 +25,6 @@ public class LoginCommandHandler(UserManager<User> _userManager, SignInManager<U
         if (loginResult.Succeeded)
         {
             var claims = await _claimsService.GenerateUserClaimsAsync(user);
-            await _signInManager.SignInWithClaimsAsync(user, isPersistent: true, claims);
             return new(new() { Id = user.Id, Token = _jwtService.GenerateToken(user, claims) });
         }
         else if (loginResult.RequiresTwoFactor)

@@ -1,4 +1,5 @@
 ﻿using EVM.Data.Models.EventFeature;
+using EVM.Data.Models.IdentityFeature;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection.Emit;
 
@@ -6,6 +7,10 @@ namespace EVM.Data.Models.ResourceFeature;
 
 public class EventResource : IDBConfigurableModel
 {
+    public required Guid UserId { get; set; }
+
+    public virtual User? User { get; set; }
+
     public required Guid EventId { get; set; }
 
     public virtual Event? Event { get; set; }

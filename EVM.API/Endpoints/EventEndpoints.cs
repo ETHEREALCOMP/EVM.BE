@@ -15,7 +15,7 @@ public class EventEndpoints
             ([FromServices] CreateEventCommandHandler commandHandler,
             [FromBody] CreateEventRequest request,
             CancellationToken cancellationToken) => commandHandler.Handle(request, cancellationToken))
-            .RequireAuthorization()
+            .AllowAnonymous()
             .WithTags(Tag);
 
         app.MapPost(Routes.Event.EventTask.Base,
