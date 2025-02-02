@@ -1,8 +1,6 @@
 ﻿using EVM.Data.Models.IdentityFeature;
 using EVM.Services.Exceptions;
-using EVM.Services.Features.Identity.Models.Const;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using EVM.Services.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -16,14 +14,25 @@ public class CustomClaimsValidator(ILogger<CustomClaimsValidator> _logger, IHttp
 
     public async Task ValidateClaims()
     {
-        var user = await _userManager.GetUserAsync(_httpContext.User);
+        var userId = _httpContext.User?.GetId();
+        if (userId == null)
+        {
+            _logger.LogWarning("User ID not found in HttpContext");
+            foreach (var claim in _httpContext.User.Claims)
+            {
+                _logger.LogInformation("Claim Type: {ClaimType}, Claim Value: {ClaimValue}", claim.Type, claim.Value);
+            }
+            throw new UserNotFoundException();
+        }
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user == null)
         {
+            _logger.LogWarning("User not found for ID {UserId}", userId);
             throw new UserNotFoundException();
         }
 
         var claims = await _claimsService.GenerateUserClaimsAsync(user);
-        var identity = new ClaimsIdentity(claims, "Custom");
-        _httpContext.User.AddIdentity(identity);
+        _httpContext.User?.AddIdentity(new ClaimsIdentity(claims));
     }
 }

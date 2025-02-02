@@ -20,22 +20,15 @@ public class LoginCommandHandler(UserManager<User> _userManager, SignInManager<U
             return new(HttpStatusCode.Unauthorized, "Invalid credentials");
         }
 
-        var loginResult = await _signInManager.PasswordSignInAsync(user, request.Password, true, false);
-
-        if (loginResult.Succeeded)
+        var loginResult = await _userManager.CheckPasswordAsync(user, request.Password);
+        if (!loginResult)
         {
-            var claims = await _claimsService.GenerateUserClaimsAsync(user);
-            return new(new() { Id = user.Id, Token = _jwtService.GenerateToken(user, claims) });
-        }
-        else if (loginResult.RequiresTwoFactor)
-        {
-            return new(HttpStatusCode.Unauthorized, "2 Factor Authentication required");
-        }
-        else if (loginResult.IsLockedOut)
-        {
-            return new(HttpStatusCode.Unauthorized, "Account is locked");
+            return new(HttpStatusCode.Unauthorized, "Invalid credentials");
         }
 
-        return new(HttpStatusCode.Unauthorized, "Invalid credentials");
+        var claims = await _claimsService.GenerateUserClaimsAsync(user);
+        var token = _jwtService.GenerateToken(user, claims);
+
+        return new(new() { Id = user.Id, Token = token });
     }
 }

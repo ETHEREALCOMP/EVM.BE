@@ -4,15 +4,16 @@ using EVM.Services.Features.Identity.Models.Requests;
 using EVM.Services.Features.Models.Responses;
 using EVM.Services.Service;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 
 namespace EVM.Services.Features.Identity.Commands;
 
-public class RegisterCommandHandler(CreateUserService _createUserService, AppDbContext _appDbContext) 
+public class RegisterCommandHandler(SignInManager<User> _signInManager, CreateUserService _createUserService, AppDbContext _dbContext, ClaimsService _claimsService) 
     : IRequestHandler<RegisterRequest, ApiResponse<BaseResponse>>
 {
     public async Task<ApiResponse<BaseResponse>> Handle(RegisterRequest request, CancellationToken cancellationToken)
     {
-        var user = new User
+        var newUser = new User
         {
             Email = request.Email,
             UserName = request.UserName,
@@ -21,8 +22,10 @@ public class RegisterCommandHandler(CreateUserService _createUserService, AppDbC
             Role = Data.Enums.UserRole.None,
         };
 
-        await _createUserService.CreateAsync(user, request.Password, cancellationToken);
+        await _createUserService.CreateAsync(newUser, request.Password, cancellationToken);
+        var claims = await _claimsService.GenerateUserClaimsAsync(newUser);
+        await _signInManager.SignInWithClaimsAsync(newUser, isPersistent: true, claims);
 
-        return new(new() { Id = user.Id });
+        return new(new() { Id = newUser.Id });
     }
 }

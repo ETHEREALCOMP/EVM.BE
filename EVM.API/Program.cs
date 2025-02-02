@@ -5,6 +5,7 @@ using EVM.Data;
 using EVM.Services;
 using EVM.Services.Features.Identity;
 using EVM.Services.Service;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
@@ -66,7 +67,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<CustomClaimsValidator>();
+builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
 IdentityModule.Register(builder.Services, builder.Configuration);
 Database.Register(builder.Services, builder.Configuration);
 ServicesModule.Register(builder.Services, builder.Configuration);
@@ -85,9 +87,9 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
     app.UseSwaggerUI();
 }
 
+EndpointsModule.Register(app);
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-EndpointsModule.Register(app);
 
 app.Run();
