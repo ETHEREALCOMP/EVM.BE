@@ -26,33 +26,25 @@ public class CreateEventCommandHandler
         var userId = _httpContext.User?.GetId()
             ?? throw new UserNotFoundException();
 
-        try
+        var user = await _appDbContext.Users
+               .Where(x => x.Id == userId)
+               .FirstOrDefaultAsync(cancellationToken)
+               ?? throw new UserNotFoundException();
+
+        var newEvent = new Data.Models.EventFeature.Event
         {
-            var user = await _appDbContext.Users
-                .Where(x => x.Id == userId)
-                .FirstOrDefaultAsync(cancellationToken)
-                ?? throw new UserNotFoundException();
+            Title = request.Title,
+            Description = request.Description,
+            Location = request.Location,
+            CreatedOn = DateTime.UtcNow,
+            UserId = userId,
+        };
 
-            var newEvent = new Data.Models.EventFeature.Event
-            {
-                Title = request.Title,
-                Description = request.Description,
-                Location = request.Location,
-                CreatedOn = DateTime.UtcNow,
-                UserId = userId,
-            };
+        _appDbContext.Events.Add(newEvent);
+        await _appDbContext.SaveChangesAsync(cancellationToken);
 
-            _appDbContext.Events.Add(newEvent);
-            await _appDbContext.SaveChangesAsync(cancellationToken);
-
-            _logger.LogInformation("Event created successfully with ID: {EventId}", newEvent.Id);
-            return new(new() { Id = newEvent.Id });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred while creating event.");
-            return new(HttpStatusCode.InternalServerError, "An error occurred while creating the event.");
-        }
+        _logger.LogInformation("Event created successfully with ID: {EventId}", newEvent.Id);
+        return new(new() { Id = newEvent.Id });
     }
 }
 

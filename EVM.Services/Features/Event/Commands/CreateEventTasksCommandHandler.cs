@@ -4,6 +4,7 @@ using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
 using EVM.Services.Features.Models.Responses;
+using EVM.Services.Service;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -13,14 +14,17 @@ using SendGrid.Helpers.Errors.Model;
 namespace EVM.Services.Features.Event.Commands;
 
 public class CreateEventTasksCommandHandler
-    (ILogger<CreateEventTasksCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor)
+    (ILogger<CreateEventTasksCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, CustomClaimsValidator _customClaimsValidator)
     : IRequestHandler<CreateEventTaskRequest, ApiResponse<BaseResponse>>
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
     public async Task<ApiResponse<BaseResponse>> Handle(CreateEventTaskRequest request, CancellationToken cancellationToken)
     {
-        //var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+        await _customClaimsValidator.ValidateClaims();
+
+        var userId = _httpContext.User?.GetId()
+            ?? throw new UserNotFoundException();
 
         var eventEntity = await _appDbContext.Events
         .Include(e => e.EventTasks)
@@ -32,7 +36,7 @@ public class CreateEventTasksCommandHandler
             EventId = request.EventId,
             Title = request.Title,
             Description = request.Description,
-            UserId = request.UserId,
+            UserId = userId,
             Status = Data.Enums.TaskStatus.NotStarted,
         };
 
