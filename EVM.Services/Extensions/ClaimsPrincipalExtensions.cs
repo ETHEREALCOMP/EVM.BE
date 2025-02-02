@@ -6,10 +6,9 @@ namespace EVM.Services.Extensions;
 
 public static class ClaimsPrincipalExtensions
 {
-    public static Guid GetId(this ClaimsPrincipal user)
+    public static Guid? GetId(this ClaimsPrincipal user)
     {
-        var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return userIdClaim != null ? Guid.Parse(userIdClaim)
-            : throw new UserNotFoundException("User ID not found.");
+        var name = user.FindFirstValue(ClaimTypes.NameIdentifier);
+        return name == null ? null : Guid.Parse(name);
     }
 }

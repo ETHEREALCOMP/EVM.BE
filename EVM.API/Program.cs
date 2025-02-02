@@ -5,14 +5,11 @@ using EVM.Data;
 using EVM.Services;
 using EVM.Services.Features.Identity;
 using EVM.Services.Service;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Stripe;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -38,46 +35,68 @@ builder.Services.Configure<JsonOptions>(options =>
     options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
-builder.Services.Configure<IdentityOptions>(options =>
+builder.Services.AddAuthorization(options =>
 {
-    options.Password.RequireDigit = false;
-    options.Password.RequireLowercase = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequiredLength = 3;
+    options.AddPolicy("CreateEventPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("role", "Admin", "EventCreator");
+    });
 });
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = false;
-        options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            NameClaimType = JwtRegisteredClaimNames.Sub,
-            RoleClaimType = ClaimTypes.Role,
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero  // Вимикає затримку валідації
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+                return Task.CompletedTask;
+            },
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine($"Token validated for: {context.Principal.Identity.Name}");
+                return Task.CompletedTask;
+            }
         };
     });
-builder.Services.AddAuthorization();
-builder.Services.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CustomClaimsValidator>();
-builder.Services.AddScoped<IClaimsTransformation, CustomClaimsTransformer>();
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;  // Ensures at least one uppercase letter
+    options.Password.RequireNonAlphanumeric = true;  // Ensures at least one non-alphanumeric character
+    options.Password.RequiredLength = 3;  // Minimum length of the password
+});
+
 IdentityModule.Register(builder.Services, builder.Configuration);
 Database.Register(builder.Services, builder.Configuration);
 ServicesModule.Register(builder.Services, builder.Configuration);
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseCors("AllowLocalhost");
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
 app.UseHsts();
 
 if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
@@ -87,9 +106,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Local"))
     app.UseSwaggerUI();
 }
 
+app.UseHttpsRedirection();
 EndpointsModule.Register(app);
-
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();

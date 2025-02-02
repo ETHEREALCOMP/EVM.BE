@@ -11,8 +11,10 @@ public static class ServicesModule
     public static void Register(IServiceCollection services, IConfiguration configuration)
     {
         services.AddHttpContextAccessor();
-        services.AddScoped<JwtService>();
+        services.AddScoped<ClaimsService>();
+        services.AddScoped<CreateUserService>();
         services.AddScoped<CustomClaimsValidator>();
+        services.AddScoped<JwtService>();
         EventModule.Register(services);
         ResourceModule.Register(services, configuration);
     }
