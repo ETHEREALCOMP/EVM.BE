@@ -29,6 +29,11 @@ public class CreateEventCommandHandler
                .FirstOrDefaultAsync(cancellationToken)
                ?? throw new UserNotFoundException();
 
+        if (user.Role != Data.Enums.UserRole.Organizer)
+        {
+            user.Role = Data.Enums.UserRole.Organizer;
+        }
+
         var newEvent = new Data.Models.EventFeature.Event
         {
             Title = request.Title,

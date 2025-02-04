@@ -3,7 +3,7 @@
 [Flags]
 public enum UserRole
 {
-    None = 0,
+    User = 0,
 
     Guest = 1,
 

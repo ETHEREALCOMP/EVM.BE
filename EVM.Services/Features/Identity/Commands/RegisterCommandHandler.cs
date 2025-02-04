@@ -19,7 +19,7 @@ public class RegisterCommandHandler(SignInManager<User> _signInManager, CreateUs
             UserName = request.UserName,
             Name = request.Name,
             Password = request.Password,
-            Role = Data.Enums.UserRole.Admin,
+            Role = Data.Enums.UserRole.User,
         };
 
         await _createUserService.CreateAsync(newUser, request.Password, cancellationToken);
