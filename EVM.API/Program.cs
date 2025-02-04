@@ -3,6 +3,7 @@ using EVM.API.Extensions;
 using EVM.API.Middleware;
 using EVM.Data;
 using EVM.Services;
+using EVM.Services.Extensions;
 using EVM.Services.Features.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
@@ -35,17 +36,8 @@ builder.Services.Configure<JsonOptions>(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("CreateEventPolicy", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("role", "Admin", "EventCreator");
-    });
+    options.AddCrudPolicies();
 
-    options.AddPolicy("CreateEventTaskPolicy", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("role", "Admin", "EventTaskCreator");
-    });
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
