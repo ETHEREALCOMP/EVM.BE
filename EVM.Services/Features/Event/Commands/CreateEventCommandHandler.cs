@@ -19,7 +19,7 @@ public class CreateEventCommandHandler
 
     public async Task<ApiResponse<BaseResponse>> Handle(CreateEventRequest request, CancellationToken cancellationToken)
     {
-        await _authorizationService.CanCreateEvent(_httpContext.User);
+        await _authorizationService.CanPerformActionAsync(_httpContext.User, "Create", "Event");
 
         var userId = _httpContext.User?.GetId()
             ?? throw new UserNotFoundException();
