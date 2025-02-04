@@ -1,11 +1,10 @@
 ﻿using EVM.Data;
-using EVM.Data.Enums;
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
 using EVM.Services.Features.Event.Models.Requests;
 using EVM.Services.Features.Models.Responses;
-using EVM.Services.Service;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -14,14 +13,14 @@ using SendGrid.Helpers.Errors.Model;
 namespace EVM.Services.Features.Event.Commands;
 
 public class CreateEventTasksCommandHandler
-    (ILogger<CreateEventTasksCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, CustomClaimsValidator _customClaimsValidator)
+    (ILogger<CreateEventTasksCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
     : IRequestHandler<CreateEventTaskRequest, ApiResponse<BaseResponse>>
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
     public async Task<ApiResponse<BaseResponse>> Handle(CreateEventTaskRequest request, CancellationToken cancellationToken)
     {
-        await _customClaimsValidator.ValidateClaims();
+        await _authorizationService.CanCreateEvent(_httpContext.User);
 
         var userId = _httpContext.User?.GetId()
             ?? throw new UserNotFoundException();

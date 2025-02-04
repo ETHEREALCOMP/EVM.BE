@@ -1,5 +1,4 @@
-﻿using EVM.Services.Exceptions;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 
 namespace EVM.Services.Extensions;
@@ -14,6 +13,18 @@ public static class AuthorizationServiceExtensions
         }
 
         var result = await authorizationService.AuthorizeAsync(user, null, "CreateEventPolicy");
+
+        return result.Succeeded;
+    }
+
+    public static async Task<bool> CanCreateEventTask(this IAuthorizationService authorizationService, ClaimsPrincipal user)
+    {
+        if (user?.Identity == null || !user.Identity.IsAuthenticated)
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+
+        var result = await authorizationService.AuthorizeAsync(user, null, "CreateEventTaslPolicy");
 
         return result.Succeeded;
     }

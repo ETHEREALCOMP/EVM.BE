@@ -13,7 +13,6 @@ public static class ServicesModule
         services.AddHttpContextAccessor();
         services.AddScoped<ClaimsService>();
         services.AddScoped<CreateUserService>();
-        services.AddScoped<CustomClaimsValidator>();
         services.AddScoped<JwtService>();
         EventModule.Register(services);
         ResourceModule.Register(services, configuration);

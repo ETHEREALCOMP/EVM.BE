@@ -4,12 +4,10 @@ using EVM.API.Middleware;
 using EVM.Data;
 using EVM.Services;
 using EVM.Services.Features.Identity;
-using EVM.Services.Service;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Stripe;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -42,6 +40,12 @@ builder.Services.AddAuthorization(options =>
         policy.RequireAuthenticatedUser();
         policy.RequireClaim("role", "Admin", "EventCreator");
     });
+
+    options.AddPolicy("CreateEventTaskPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("role", "Admin", "EventTaskCreator");
+    });
 });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -56,7 +60,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero  // Вимикає затримку валідації
+            ClockSkew = TimeSpan.Zero,
         };
 
         options.Events = new JwtBearerEvents
@@ -75,15 +79,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<CustomClaimsValidator>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
-    options.Password.RequireUppercase = true;  // Ensures at least one uppercase letter
-    options.Password.RequireNonAlphanumeric = true;  // Ensures at least one non-alphanumeric character
-    options.Password.RequiredLength = 3;  // Minimum length of the password
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 3;
 });
 
 IdentityModule.Register(builder.Services, builder.Configuration);
