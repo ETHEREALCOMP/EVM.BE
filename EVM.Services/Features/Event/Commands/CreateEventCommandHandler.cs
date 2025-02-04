@@ -41,6 +41,7 @@ public class CreateEventCommandHandler
             Location = request.Location,
             CreatedOn = DateTime.UtcNow,
             UserId = userId,
+            Role = user.Role,
         };
 
         _appDbContext.Events.Add(newEvent);

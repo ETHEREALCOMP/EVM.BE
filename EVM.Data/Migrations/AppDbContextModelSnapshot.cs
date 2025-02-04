@@ -41,6 +41,9 @@ namespace EVM.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -255,9 +258,14 @@ namespace EVM.Data.Migrations
                     b.Property<Guid>("ResourceId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("EventId", "ResourceId");
 
                     b.HasIndex("ResourceId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("EventResources");
                 });
@@ -484,9 +492,17 @@ namespace EVM.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EVM.Data.Models.IdentityFeature.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Event");
 
                     b.Navigation("Resource");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("EVM.Data.Models.TicketFeature.Ticket", b =>
