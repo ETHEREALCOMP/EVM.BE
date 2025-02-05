@@ -50,6 +50,7 @@ public class CreateEventTasksCommandHandler
             Status = Data.Enums.TaskStatus.NotStarted,
         };
 
+        eventEntity.EventTasks.Add(newEventTasks);
         _appDbContext.EventTasks.Add(newEventTasks);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
