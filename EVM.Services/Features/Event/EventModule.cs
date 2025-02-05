@@ -11,5 +11,6 @@ public class EventModule
         services.AddScoped<CreateEventCommandHandler>();
         services.AddScoped<CreateEventTasksCommandHandler>();
         services.AddScoped<GetEventsQueryHandler>();
+        services.AddScoped<GetByIdEventQueryHandler>();
     }
 }
