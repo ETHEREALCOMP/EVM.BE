@@ -77,7 +77,8 @@ namespace EVM.Data.Migrations
                     CreatedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     FinishedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Location = table.Column<string>(type: "text", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -225,11 +226,18 @@ namespace EVM.Data.Migrations
                 columns: table => new
                 {
                     EventId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ResourceId = table.Column<Guid>(type: "uuid", nullable: false)
+                    ResourceId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventResources", x => new { x.EventId, x.ResourceId });
+                    table.ForeignKey(
+                        name: "FK_EventResources_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_EventResources_Events_EventId",
                         column: x => x.EventId,
@@ -341,6 +349,11 @@ namespace EVM.Data.Migrations
                 name: "IX_EventResources_ResourceId",
                 table: "EventResources",
                 column: "ResourceId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventResources_UserId",
+                table: "EventResources",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_UserId",

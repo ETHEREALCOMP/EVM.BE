@@ -5,28 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace EVM.Services.Service;
 
-public class CreateUserService(AppDbContext _dbContext, UserManager<User> _userManager, ILogger<CreateUserService> _logger)
+public class CreateUserService(UserManager<User> _userManager, ILogger<CreateUserService> _logger)
 {
-    public async Task CreateAsync(User newUser, string? password = null, CancellationToken cancellationToken = default)
+    public async Task CreateAsync(User newUser, string password, CancellationToken cancellationToken = default)
     {
-        using var transaction = await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+        var result = await _userManager.CreateAsync(newUser, password);
 
-        try
+        if (!result.Succeeded)
         {
-            var result = await (password is null ? _userManager.CreateAsync(newUser) : _userManager.CreateAsync(newUser, password));
-
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-            }
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
-        }
-        catch
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            throw;
+            throw new InvalidOperationException("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
         }
     }
 }

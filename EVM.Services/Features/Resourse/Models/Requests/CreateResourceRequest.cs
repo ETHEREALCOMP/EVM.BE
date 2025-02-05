@@ -9,7 +9,5 @@ public record CreateResourceRequest : IRequest<ApiResponse<CreateResourcesRespon
 {
     public required List<CreateResource> Resources { get; set; }
 
-    public required Guid UserId { get; set; }
-
     public required Guid EventId { get; set; }
 }

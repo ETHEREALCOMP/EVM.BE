@@ -22,7 +22,9 @@ public class Event : IDBConfigurableModel
 
     public required Guid UserId { get; set; }
 
-    public User? User { get; set; }
+    public virtual User? User { get; set; }
+
+    public required UserRole Role { get; set; }
 
     public virtual ICollection<EventResource> EventResources { get; set; } = [];
 

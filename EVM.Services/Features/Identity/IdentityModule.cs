@@ -51,44 +51,4 @@ public class IdentityModule
 
         return services;
     }
-
-    private static IServiceCollection AddAuthorization(IServiceCollection services)
-    {
-        services.AddAuthorizationBuilder()
-            .AddPolicy(Policies.Organizer, policy =>
-            {
-                policy.RequireAuthenticatedUser();
-                policy.Requirements.Add(new RoleRequirement(UserRole.Organizer));
-            })
-            .AddPolicy(Policies.Guest, policy =>
-            {
-                policy.RequireAuthenticatedUser();
-                policy.Requirements.Add(new RoleRequirement(UserRole.Guest));
-            })
-            .AddPolicy(Policies.Full, policy =>
-            {
-                policy.RequireAuthenticatedUser();
-                policy.Requirements.Add(new RoleRequirement(UserRole.Admin));
-            });
-
-        services.AddSingleton<IAuthorizationHandler, RoleRequirementHandler>();
-
-        return services;
-    }
-
-    private static IServiceCollection AddAuthentication(IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<IdentityOptions>(options =>
-        {
-            if (configuration.GetSection("Environment").GetValue("Local", false))
-            {
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 1;
-            }
-        });
-        return services;
-    }
 }

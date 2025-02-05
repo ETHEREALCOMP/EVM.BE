@@ -1,7 +1,6 @@
 ﻿using EVM.Data.Models.EventFeature;
 using EVM.Data.Models.IdentityFeature;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Emit;
 
 namespace EVM.Data.Models.ResourceFeature;
 

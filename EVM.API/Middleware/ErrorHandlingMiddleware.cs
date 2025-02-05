@@ -1,5 +1,6 @@
 ﻿using EVM.Services.Exceptions;
 using EVM.Services.Features.Models.Responses;
+using EVM.Services.Service;
 using System.Diagnostics;
 using System.Net;
 using System.Text.Json;

@@ -4,12 +4,13 @@ using EVM.Services.Features.Identity.Models.Responses;
 using EVM.Services.Features.Models.Responses;
 using EVM.Services.Service;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Net;
 
 namespace EVM.Services.Features.Identity.Commands;
 
-public class LoginCommandHandler(UserManager<User> _userManager, SignInManager<User> _signInManager, ClaimsService _claimsService, JwtService _jwtService)
+public class LoginCommandHandler(UserManager<User> _userManager, IHttpContextAccessor _httpContextAccessor, SignInManager<User> _signInManager, ClaimsService _claimsService, JwtService _jwtService)
     : IRequestHandler<LoginRequest, ApiResponse<BaseAuthResponse>>
 {
     public async Task<ApiResponse<BaseAuthResponse>> Handle(LoginRequest request, CancellationToken cancellationToken)
@@ -25,15 +26,22 @@ public class LoginCommandHandler(UserManager<User> _userManager, SignInManager<U
         if (loginResult.Succeeded)
         {
             var claims = await _claimsService.GenerateUserClaimsAsync(user);
-            return new(new() { Id = user.Id, Token = _jwtService.GenerateToken(user, claims) });
-        }
-        else if (loginResult.RequiresTwoFactor)
-        {
-            return new(HttpStatusCode.Unauthorized, "2 Factor Authentication required");
-        }
-        else if (loginResult.IsLockedOut)
-        {
-            return new(HttpStatusCode.Unauthorized, "Account is locked");
+            var token = _jwtService.GenerateToken(user, claims);
+
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            if (httpContext != null)
+            {
+                httpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
+                {
+                    HttpOnly = true,  // Токен недоступний у JavaScript
+                    Secure = true,  // Використовувати лише HTTPS
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddHours(1)
+                });
+            }
+
+            return new(new() { Id = user.Id, Token = token });
         }
 
         return new(HttpStatusCode.Unauthorized, "Invalid credentials");

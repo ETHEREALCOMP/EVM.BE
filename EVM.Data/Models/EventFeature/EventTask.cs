@@ -13,7 +13,7 @@ public class EventTask : IDBConfigurableModel
 
     public required Guid UserId { get; set; }
 
-    public User? User { get; set; }
+    public virtual User? User { get; set; }
 
     public required Enums.TaskStatus Status { get; set; }
 
