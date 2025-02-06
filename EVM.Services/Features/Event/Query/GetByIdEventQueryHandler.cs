@@ -9,11 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace EVM.Services.Features.Event.Query;
+
 public class GetByIdEventQueryHandler
   (ILogger<GetByIdEventQueryHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
 {
-
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
+
     public async Task<ApiResponse<GetEventResponse>> Handle(Guid id, CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Event");
@@ -23,7 +24,7 @@ public class GetByIdEventQueryHandler
             {
                 ETask = x.EventTasks.ToList(),
                 Name = x.Title,
-                Description = x.Description
+                Description = x.Description,
             })
             .FirstOrDefaultAsync(cancellationToken);
         return new(events);
