@@ -1,10 +1,6 @@
-﻿using EVM.Services.Features.Identity.Models.Responses;
-using EVM.Services.Features.Models.Responses;
-using MediatR;
+﻿namespace EVM.Services.Features.Identity.Models.Requests;
 
-namespace EVM.Services.Features.Identity.Models.Requests;
-
-public record RegisterRequest : IRequest<ApiResponse<BaseResponse>>
+public record RegisterRequest
 {
     public required string UserName { get; set; }
 

@@ -5,7 +5,6 @@ using EVM.Services.Extensions;
 using EVM.Services.Features.Models.Responses;
 using EVM.Services.Features.Resourse.Models.Requests;
 using EVM.Services.Features.Resourse.Models.Responses;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +15,6 @@ namespace EVM.Services.Features.Resourse.Commands;
 
 public class CreateResourceCommandHandler
     (ILogger<CreateResourceCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
-    : IRequestHandler<CreateResourceRequest, ApiResponse<CreateResourcesResponse>>
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 

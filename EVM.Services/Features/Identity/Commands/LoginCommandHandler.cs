@@ -3,7 +3,6 @@ using EVM.Services.Features.Identity.Models.Requests;
 using EVM.Services.Features.Identity.Models.Responses;
 using EVM.Services.Features.Models.Responses;
 using EVM.Services.Service;
-using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using System.Net;
@@ -11,7 +10,6 @@ using System.Net;
 namespace EVM.Services.Features.Identity.Commands;
 
 public class LoginCommandHandler(UserManager<User> _userManager, IHttpContextAccessor _httpContextAccessor, SignInManager<User> _signInManager, ClaimsService _claimsService, JwtService _jwtService)
-    : IRequestHandler<LoginRequest, ApiResponse<BaseAuthResponse>>
 {
     public async Task<ApiResponse<BaseAuthResponse>> Handle(LoginRequest request, CancellationToken cancellationToken)
     {
@@ -34,10 +32,10 @@ public class LoginCommandHandler(UserManager<User> _userManager, IHttpContextAcc
             {
                 httpContext.Response.Cookies.Append("AuthToken", token, new CookieOptions
                 {
-                    HttpOnly = true,  // Токен недоступний у JavaScript
-                    Secure = true,  // Використовувати лише HTTPS
+                    HttpOnly = true,
+                    Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddHours(1)
+                    Expires = DateTime.UtcNow.AddHours(1),
                 });
             }
 

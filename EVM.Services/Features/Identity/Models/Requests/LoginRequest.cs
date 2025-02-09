@@ -1,10 +1,6 @@
-﻿using EVM.Services.Features.Identity.Models.Responses;
-using EVM.Services.Features.Models.Responses;
-using MediatR;
+﻿namespace EVM.Services.Features.Identity.Models.Requests;
 
-namespace EVM.Services.Features.Identity.Models.Requests;
-
-public record LoginRequest : IRequest<ApiResponse<BaseAuthResponse>>
+public record LoginRequest
 {
     public required string Email { get; set; }
 

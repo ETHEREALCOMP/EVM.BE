@@ -1,9 +1,6 @@
-﻿using EVM.Services.Features.Models.Responses;
-using MediatR;
+﻿namespace EVM.Services.Features.Event.Models.Requests;
 
-namespace EVM.Services.Features.Event.Models.Requests;
-
-public record CreateEventTaskRequest : IRequest<ApiResponse<BaseResponse>>
+public record CreateEventTaskRequest
 {
     public required string Title { get; set; }
 
