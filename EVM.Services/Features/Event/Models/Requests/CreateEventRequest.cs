@@ -1,10 +1,6 @@
-﻿using EVM.Services.Features.Identity.Models.Responses;
-using EVM.Services.Features.Models.Responses;
-using MediatR;
+﻿namespace EVM.Services.Features.Event.Models.Requests;
 
-namespace EVM.Services.Features.Event.Models.Requests;
-
-public record CreateEventRequest : IRequest<ApiResponse<BaseResponse>>
+public record CreateEventRequest
 {
     public required string Title { get; set; }
 

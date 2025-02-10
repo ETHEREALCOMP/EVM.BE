@@ -12,7 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EVM.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:EVM.Data/Migrations/20250206121650_Init.Designer.cs
     [Migration("20250206121650_Init")]
+========
+    [Migration("20250206144838_Init")]
+>>>>>>>> origin/master:EVM.Data/Migrations/20250206144838_Init.Designer.cs
     partial class Init
     {
         /// <inheritdoc />

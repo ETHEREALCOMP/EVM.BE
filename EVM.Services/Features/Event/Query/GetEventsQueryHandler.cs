@@ -12,8 +12,8 @@ namespace EVM.Services.Features.Event.Query;
 public class GetEventsQueryHandler
   (ILogger<GetEventsQueryHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
 {
-
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
+
     public async Task<ApiResponse<List<GetEventResponse>>> Handle(CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Event");
@@ -24,7 +24,7 @@ public class GetEventsQueryHandler
             {
                 ETask = x.EventTasks.ToList(),
                 Name = x.Title,
-                Description = x.Description
+                Description = x.Description,
             })
             .ToListAsync(cancellationToken);
         return new(events);

@@ -1,11 +1,6 @@
-﻿using EVM.Data.Enums;
-using EVM.Services.Features.Models.Responses;
-using EVM.Services.Features.Resourse.Models.Responses;
-using MediatR;
+﻿namespace EVM.Services.Features.Resourse.Models.Requests;
 
-namespace EVM.Services.Features.Resourse.Models.Requests;
-
-public record CreateResourceRequest : IRequest<ApiResponse<CreateResourcesResponse>>
+public record CreateResourceRequest
 {
     public required List<CreateResource> Resources { get; set; }
 
