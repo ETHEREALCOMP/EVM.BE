@@ -23,9 +23,10 @@ public class GetEventsQueryHandler
             .Where(x => x.UserId == userId)
             .Select(x => new GetEventResponse
             {
-                ETask = x.EventTasks.ToList(),
+                Id = x.Id,
                 Name = x.Title,
                 Description = x.Description,
+                ETask = x.EventTasks.ToList(),
             })
             .AsNoTracking()
             .ToListAsync(cancellationToken) ?? throw new EntityNotFoundException("Event");

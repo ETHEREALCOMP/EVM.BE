@@ -24,9 +24,10 @@ public class GetByIdEventQueryHandler
             .Include(x => x.EventTasks)
             .Select(x => new GetEventResponse
             {
-                ETask = x.EventTasks.ToList(),
+                Id = x.Id,
                 Name = x.Title,
                 Description = x.Description,
+                ETask = x.EventTasks.ToList(),
             })
             .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken) ?? throw new EntityNotFoundException("Event");
