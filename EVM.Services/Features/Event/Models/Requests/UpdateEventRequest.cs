@@ -1,9 +1,8 @@
 ﻿using EVM.Services.Features.Models.Responses;
-using MediatR;
 
 namespace EVM.Services.Features.Event.Models.Requests;
 
-public record UpdateEventRequest : IRequest<ApiResponse<BaseResponse>>
+public record UpdateEventRequest
 {
     public required Guid EventId { get; set; }
 
