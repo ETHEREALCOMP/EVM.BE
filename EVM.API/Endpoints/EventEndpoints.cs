@@ -38,10 +38,11 @@ public class EventEndpoints
             .RequireAuthorization()
             .WithTags(Tag);
 
-        app.MapPatch(Routes.Event.Base,
+        app.MapPatch(Routes.Event.Exact("id"),
             ([FromServices] UpdateEventCommandHandler queryHandler,
             [FromBody] UpdateEventRequest request,
-            CancellationToken cancellationToken) => queryHandler.Handle(request, cancellationToken))
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken) => queryHandler.Handle(id, request, cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
     }

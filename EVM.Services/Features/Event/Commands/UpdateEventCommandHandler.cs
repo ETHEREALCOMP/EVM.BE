@@ -16,7 +16,7 @@ public class UpdateEventCommandHandler
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
-    public async Task<ApiResponse<BaseResponse>> Handle(UpdateEventRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<BaseResponse>> Handle(Guid eventId, UpdateEventRequest request, CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Update", "Event");
 
@@ -33,7 +33,7 @@ public class UpdateEventCommandHandler
             user.Role = Data.Enums.UserRole.Organizer;
         }
 
-        var existingEvent = _appDbContext.Events.AsTracking().FirstOrDefault(x => x.Id == request.EventId);
+        var existingEvent = _appDbContext.Events.AsTracking().FirstOrDefault(x => x.Id == eventId);
 
         if (existingEvent == null)
         {
@@ -49,7 +49,7 @@ public class UpdateEventCommandHandler
 
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
-        _logger.LogInformation($"Event with ID: {request.EventId} was updated successfully!", existingEvent.Id);
+        _logger.LogInformation($"Event with ID: {eventId} was updated successfully!", existingEvent.Id);
         return new(new() { Id = existingEvent.Id });
     }
 }
