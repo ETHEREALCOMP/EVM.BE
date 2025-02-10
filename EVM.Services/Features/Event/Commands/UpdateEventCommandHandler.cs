@@ -40,9 +40,9 @@ public class UpdateEventCommandHandler
             throw new BaseCustomException("Event was not found!", HttpStatusCode.NotFound);
         }
 
-        existingEvent.Title = request.Title;
+        existingEvent.Title = request.Title ?? " ";
         existingEvent.Description = request.Description;
-        existingEvent.Location = request.Location;
+        existingEvent.Location = request.Location ?? " ";
         existingEvent.CreatedOn = DateTime.UtcNow;
         existingEvent.UserId = userId;
         existingEvent.Role = user.Role;

@@ -26,6 +26,7 @@ public class CreateEventTasksCommandHandler
 
         var eventEntity = await _appDbContext.Events
         .Include(e => e.EventTasks)
+        .AsNoTracking()
         .FirstOrDefaultAsync(e => e.Id == request.EventId, cancellationToken)
         ?? throw new NotFoundException("Event not found.");
 

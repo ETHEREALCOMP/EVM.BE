@@ -15,18 +15,22 @@ public class GetByIdEventQueryHandler
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
-    public async Task<ApiResponse<GetEventResponse>> Handle(Guid id, CancellationToken cancellationToken)
+    public async Task<ApiResponse<GetEventResponse>> Handle(Guid eventId, CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Event");
         var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
-        var events = await _appDbContext.Events.Where(x => x.UserId == userId && x.Id == id)
+
+        var events = await _appDbContext.Events.Where(x => x.UserId == userId && x.Id == eventId)
+            .Include(x => x.EventTasks)
             .Select(x => new GetEventResponse
             {
                 ETask = x.EventTasks.ToList(),
                 Name = x.Title,
                 Description = x.Description,
             })
-            .FirstOrDefaultAsync(cancellationToken);
+            .AsNoTracking()
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new EntityNotFoundException("Event");
+
         return new(events);
     }
 }

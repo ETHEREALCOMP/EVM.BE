@@ -18,6 +18,7 @@ public class GetEventsQueryHandler
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Event");
         var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
+
         var events = await _appDbContext.Events
             .Where(x => x.UserId == userId)
             .Select(x => new GetEventResponse
@@ -26,7 +27,9 @@ public class GetEventsQueryHandler
                 Name = x.Title,
                 Description = x.Description,
             })
-            .ToListAsync(cancellationToken);
+            .AsNoTracking()
+            .ToListAsync(cancellationToken) ?? throw new EntityNotFoundException("Event");
+
         return new(events);
     }
 }
