@@ -37,5 +37,13 @@ public class EventEndpoints
             CancellationToken cancellationToken) => queryHandler.Handle(id, cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
-            }
+
+        app.MapPatch(Routes.Event.Exact("id"),
+            ([FromServices] UpdateEventCommandHandler queryHandler,
+            [FromBody] UpdateEventRequest request,
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken) => queryHandler.Handle(id, request, cancellationToken))
+            .RequireAuthorization()
+            .WithTags(Tag);
+    }
 }

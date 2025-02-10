@@ -33,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<Folder Include="Features\Event\Models\Requests\" />
 	<Folder Include="Features\Event\Models\Responses\" />
 	<Folder Include="Features\Models\Requests\" />
   </ItemGroup>
