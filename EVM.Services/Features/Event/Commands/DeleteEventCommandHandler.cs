@@ -1,7 +1,6 @@
 ﻿using EVM.Data;
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
-using EVM.Services.Features.Event.Models.Requests;
 using EVM.Services.Features.Models.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,14 +10,14 @@ using System.Net;
 
 namespace EVM.Services.Features.Event.Commands;
 
-public class UpdateEventCommandHandler
-    (ILogger<UpdateEventCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
+public class DeleteEventCommandHandler
+    (ILogger<DeleteEventCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
-    public async Task<ApiResponse<BaseResponse>> Handle(Guid eventId, UpdateEventRequest request, CancellationToken cancellationToken)
+    public async Task<ApiResponse<BaseResponse>> Handle(Guid eventId, CancellationToken cancellationToken)
     {
-        await _authorizationService.CanPerformActionAsync(_httpContext.User, "Update", "Event");
+        await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Event");
 
         var userId = _httpContext.User?.GetId()
             ?? throw new UserNotFoundException();
@@ -33,24 +32,19 @@ public class UpdateEventCommandHandler
             user.Role = Data.Enums.UserRole.Organizer;
         }
 
-        var existingEvent = _appDbContext.Events
+        var eventToDelete = _appDbContext.Events
             .AsTracking()
             .FirstOrDefault(x => x.Id == eventId)
             ?? throw new BaseCustomException("Event was not found!", HttpStatusCode.NotFound);
 
-        existingEvent.Title = request.Title ?? existingEvent.Title;
-        existingEvent.Description = request.Description;
-        existingEvent.Location = request.Location ?? existingEvent.Location;
-        existingEvent.CreatedOn = DateTime.UtcNow;
-        existingEvent.UserId = userId;
-        existingEvent.Role = user.Role;
+        _appDbContext.Events.Remove(eventToDelete);
 
         if (await _appDbContext.SaveChangesAsync(cancellationToken) == 0)
         {
-            throw new BaseCustomException("Couldn't update the data in the database. Please try again later!", HttpStatusCode.InternalServerError);
+            throw new BaseCustomException("Couldn't delete the data in the database. Please try again later!", HttpStatusCode.InternalServerError);
         }
 
-        _logger.LogInformation("Event with ID: {EventId} was updated successfully!", existingEvent.Id);
-        return new(new() { Id = existingEvent.Id });
+        _logger.LogInformation("Event with ID: {eventId} was deleted successfully!", eventToDelete.Id);
+        return new(new() { Id = eventToDelete.Id });
     }
 }
