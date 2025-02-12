@@ -19,6 +19,7 @@ public class GetResourceQueryHandler
     public async Task<ApiResponse<List<GetResourceResponse>>> Handle(CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Resource");
+
         var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
         var resourcesQuery = await _appDbContext.Resources
@@ -26,15 +27,10 @@ public class GetResourceQueryHandler
             {
                 Id = x.Id,
                 Name = x.Name,
-                Resources = x.EventResources.Select(y => new Resource
-                {
-                    Id = y.ResourceId,
-                    Name = y.Resource.Name,
-                    Type = y.Resource.Type,
-                })
-                .ToList(),
+                Type = x.Type,
+                Resources = x.EventResources.ToList(),
             })
-            .ToListAsync(cancellationToken);
+            .ToListAsync(cancellationToken) ?? throw new EntityNotFoundException("Resources");
 
         return new(resourcesQuery);
     }
