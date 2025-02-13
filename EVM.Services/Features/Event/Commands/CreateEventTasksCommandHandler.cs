@@ -25,15 +25,15 @@ public class CreateEventTasksCommandHandler
             ?? throw new UserNotFoundException();
 
         var eventEntity = await _appDbContext.Events
-        .Include(e => e.EventTasks)
-        .AsNoTracking()
-        .FirstOrDefaultAsync(e => e.Id == request.EventId, cancellationToken)
-        ?? throw new NotFoundException("Event not found.");
+            .Include(e => e.EventTasks)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == request.EventId, cancellationToken)
+            ?? throw new NotFoundException("Event not found.");
 
         var user = await _appDbContext.Events
-               .Where(x => x.UserId == userId)
-               .FirstOrDefaultAsync(cancellationToken)
-               ?? throw new UserNotFoundException();
+            .Where(x => x.UserId == userId)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new UserNotFoundException();
 
         if (user.Role != Data.Enums.UserRole.Organizer)
         {
@@ -53,6 +53,7 @@ public class CreateEventTasksCommandHandler
         _appDbContext.EventTasks.Add(newEventTasks);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
+        _logger.LogInformation("Event task created successfully with ID: {EventTasksId}", newEventTasks.Id);
         return new(new() { Id = newEventTasks.Id });
     }
 }

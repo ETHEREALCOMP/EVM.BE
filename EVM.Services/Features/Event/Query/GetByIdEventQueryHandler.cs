@@ -32,6 +32,7 @@ public class GetByIdEventQueryHandler
             .AsNoTracking()
             .FirstOrDefaultAsync(cancellationToken) ?? throw new EntityNotFoundException("Event");
 
+        _logger.LogInformation("Event with ID: {EventId} has been successfully retrieved and sent.", events.Id);
         return new(events);
     }
 }

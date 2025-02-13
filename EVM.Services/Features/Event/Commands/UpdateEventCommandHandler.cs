@@ -24,32 +24,33 @@ public class UpdateEventCommandHandler
             ?? throw new UserNotFoundException();
 
         var user = await _appDbContext.Users
-               .Where(x => x.Id == userId)
-               .FirstOrDefaultAsync(cancellationToken)
-               ?? throw new UserNotFoundException();
+            .Where(x => x.Id == userId)
+            .FirstOrDefaultAsync(cancellationToken)
+            ?? throw new UserNotFoundException();
 
         if (user.Role != Data.Enums.UserRole.Organizer)
         {
             user.Role = Data.Enums.UserRole.Organizer;
         }
 
-        var existingEvent = _appDbContext.Events.AsTracking().FirstOrDefault(x => x.Id == eventId);
+        var existingEvent = _appDbContext.Events
+            .AsTracking()
+            .FirstOrDefault(x => x.Id == eventId)
+            ?? throw new BaseCustomException("Event was not found!", HttpStatusCode.NotFound);
 
-        if (existingEvent == null)
-        {
-            throw new BaseCustomException("Event was not found!", HttpStatusCode.NotFound);
-        }
-
-        existingEvent.Title = request.Title ?? " ";
+        existingEvent.Title = request.Title ?? existingEvent.Title;
         existingEvent.Description = request.Description;
-        existingEvent.Location = request.Location ?? " ";
+        existingEvent.Location = request.Location ?? existingEvent.Location;
         existingEvent.CreatedOn = DateTime.UtcNow;
         existingEvent.UserId = userId;
         existingEvent.Role = user.Role;
 
-        await _appDbContext.SaveChangesAsync(cancellationToken);
+        if (await _appDbContext.SaveChangesAsync(cancellationToken) == 0)
+        {
+            throw new BaseCustomException("Couldn't update the data in the database. Please try again later!", HttpStatusCode.InternalServerError);
+        }
 
-        _logger.LogInformation($"Event with ID: {eventId} was updated successfully!", existingEvent.Id);
+        _logger.LogInformation("Event with ID: {EventId} was updated successfully!", existingEvent.Id);
         return new(new() { Id = existingEvent.Id });
     }
 }

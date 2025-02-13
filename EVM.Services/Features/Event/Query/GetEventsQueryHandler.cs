@@ -32,6 +32,7 @@ public class GetEventsQueryHandler
             .AsNoTracking()
             .ToListAsync(cancellationToken) ?? throw new EntityNotFoundException("Event");
 
+        _logger.LogInformation("All events for the user with ID: {UserId} have been successfully retrieved and sent!", userId);
         return new(events);
     }
 }
