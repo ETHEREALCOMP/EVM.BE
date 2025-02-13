@@ -32,19 +32,16 @@ public class DeleteEventCommandHandler
             user.Role = Data.Enums.UserRole.Organizer;
         }
 
-        var eventToDelete = _appDbContext.Events
-            .AsTracking()
-            .FirstOrDefault(x => x.Id == eventId)
-            ?? throw new BaseCustomException("Event was not found!", HttpStatusCode.NotFound);
+        var deletedRows = await _appDbContext.Events
+            .Where(x => x.Id == eventId)
+            .ExecuteDeleteAsync(cancellationToken);
 
-        _appDbContext.Events.Remove(eventToDelete);
-
-        if (await _appDbContext.SaveChangesAsync(cancellationToken) == 0)
+        if (deletedRows == 0)
         {
             throw new BaseCustomException("Couldn't delete the data in the database. Please try again later!", HttpStatusCode.InternalServerError);
         }
 
-        _logger.LogInformation("Event with ID: {eventId} was deleted successfully!", eventToDelete.Id);
-        return new(new() { Id = eventToDelete.Id });
+        _logger.LogInformation("Event with ID: {eventId} was deleted successfully!", eventId);
+        return new(new() { Id = eventId });
     }
 }
