@@ -1,8 +1,6 @@
 ﻿using EVM.Data;
-using EVM.Data.Models.ResourceFeature;
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
-using EVM.Services.Features.Event.Models.Responses;
 using EVM.Services.Features.Models.Responses;
 using EVM.Services.Features.Resourse.Models.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -17,25 +15,21 @@ public class GetByIdResourceQueryHandler
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
-    public async Task<ApiResponse<GetResourceResponse>> Handle(Guid eventId, CancellationToken cancellationToken)
+    public async Task<ApiResponse<GetResourceResponse>> Handle(Guid id, CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Resource");
+
         var userId = _httpContext.User.GetId() ?? throw new UserNotFoundException();
 
-        var resourcesQuery = await _appDbContext.Resources.Where(x => x.Id == eventId)
+        var resourcesQuery = await _appDbContext.Resources
             .Select(x => new GetResourceResponse
             {
                 Id = x.Id,
                 Name = x.Name,
-                Resources = x.EventResources.Select(y => new Resource
-                {
-                    Id = y.ResourceId,
-                    Name = y.Resource.Name,
-                    Type = y.Resource.Type,
-                })
-                .ToList(),
+                Type = x.Type,
+                Resources = x.EventResources.ToList(),
             })
-            .FirstOrDefaultAsync(cancellationToken);
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new EntityNotFoundException("Resources");
 
         return new(resourcesQuery);
     }
