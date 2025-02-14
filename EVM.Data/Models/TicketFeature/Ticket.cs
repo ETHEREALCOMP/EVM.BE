@@ -13,6 +13,8 @@ public class Ticket : IDBConfigurableModel
 
     public required Guid EventId { get; set; }
 
+    public required string Location { get; set; }
+
     public Event? Event { get; set; }
 
     public required Guid UserId { get; set; }

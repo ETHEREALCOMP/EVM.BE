@@ -10,5 +10,7 @@ public class CreateTicketRequest
 {
     public decimal Price { get; set; }
 
+    public string? Location { get; set; }
+
     public Data.Enums.TicketType? Type { get; set; }
 }

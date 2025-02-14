@@ -55,6 +55,7 @@ public class CreateEventCommandHandler
                 {
                     Price = request.TicketRequest.Price,
                     Type = request.TicketRequest.Type ?? Data.Enums.TicketType.None,
+                    Location = request.Location,
                     EventId = newEvent.Id,
                     UserId = userId,
                 };
