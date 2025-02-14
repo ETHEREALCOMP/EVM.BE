@@ -10,9 +10,11 @@ public class EventModule
     {
         services.AddScoped<CreateEventCommandHandler>();
         services.AddScoped<CreateEventTasksCommandHandler>();
-        services.AddScoped<GetEventsQueryHandler>();
+        services.AddScoped<GetAllEventsQueryHandler>();
         services.AddScoped<GetByIdEventQueryHandler>();
         services.AddScoped<UpdateEventCommandHandler>();
         services.AddScoped<DeleteEventCommandHandler>();
+        services.AddScoped<GetAllTaskQueryHandler>();
+        services.AddScoped<GetByIdTaskQueryHandler>();
     }
 }

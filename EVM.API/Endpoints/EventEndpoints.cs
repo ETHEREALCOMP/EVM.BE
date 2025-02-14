@@ -26,7 +26,7 @@ public class EventEndpoints
             .WithTags(Tag);
 
         app.MapGet(Routes.Event.Base,
-            ([FromServices] GetEventsQueryHandler queryHandler,
+            ([FromServices] GetAllEventsQueryHandler queryHandler,
             CancellationToken cancellationToken) => queryHandler.Handle(cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
@@ -50,6 +50,20 @@ public class EventEndpoints
             ([FromServices] DeleteEventCommandHandler queryHandler,
             [FromRoute] Guid id,
             CancellationToken cancellationToken) => queryHandler.Handle(id, cancellationToken))
+            .RequireAuthorization()
+            .WithTags(Tag);
+
+        app.MapGet(Routes.Event.EventTask.Exact("id"),
+            ([FromServices] GetAllTaskQueryHandler queryHandler,
+            [FromRoute] Guid eventId,
+            CancellationToken cancellationToken) => queryHandler.Handle(eventId, cancellationToken))
+            .RequireAuthorization()
+            .WithTags(Tag);
+
+        app.MapGet(Routes.Event.EventTask.Exact("id"),
+            ([FromServices] GetByIdEventQueryHandler queryHandler,
+            [FromRoute] Guid taskId,
+            CancellationToken cancellationToken) => queryHandler.Handle(taskId, cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
     }

@@ -7,4 +7,8 @@ public record CreateEventRequest
     public string? Description { get; set; }
 
     public required string Location { get; set; }
+
+    public required bool IsTicket { get; set; }
+
+    public virtual CreateTicketRequest? TicketRequest { get; set; }
 }
