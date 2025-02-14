@@ -25,9 +25,10 @@ public class CreateEventTasksCommandHandler
             ?? throw new UserNotFoundException();
 
         var eventEntity = await _appDbContext.Events
-            .Include(e => e.EventTasks)
+            .Where(x => x.Id == request.EventId)
+            .Include(x => x.EventTasks)
             .AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Id == request.EventId, cancellationToken)
+            .FirstOrDefaultAsync(cancellationToken)
             ?? throw new NotFoundException("Event not found.");
 
         var user = await _appDbContext.Events
@@ -46,7 +47,7 @@ public class CreateEventTasksCommandHandler
             Title = request.Title,
             Description = request.Description,
             UserId = userId,
-            Status = Data.Enums.TaskStatus.NotStarted,
+            Status = request.Status ?? Data.Enums.TaskStatus.NotStarted,
         };
 
         eventEntity.EventTasks.Add(newEventTasks);

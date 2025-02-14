@@ -227,7 +227,8 @@ namespace EVM.Data.Migrations
                 {
                     EventId = table.Column<Guid>(type: "uuid", nullable: false),
                     ResourceId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Role = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {

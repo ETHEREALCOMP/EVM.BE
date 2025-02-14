@@ -26,11 +26,11 @@ public class Event : IDBConfigurableModel
 
     public required UserRole Role { get; set; }
 
-    public virtual ICollection<EventResource> EventResources { get; set; } = [];
+    public virtual List<EventResource> EventResources { get; set; } = [];
 
-    public virtual ICollection<Ticket> Tickets { get; set; } = [];
+    public virtual List<Ticket> Tickets { get; set; } = [];
 
-    public virtual ICollection<EventTask> EventTasks { get; set; } = [];
+    public virtual List<EventTask> EventTasks { get; set; } = [];
 
     public static void BuildModel(ModelBuilder builder)
     {
@@ -45,16 +45,19 @@ public class Event : IDBConfigurableModel
         builder.Entity<Event>()
             .HasMany(e => e.Tickets)
             .WithOne(t => t.Event)
-            .HasForeignKey(t => t.EventId);
+            .HasForeignKey(t => t.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Event>()
             .HasMany(e => e.EventResources)
             .WithOne(er => er.Event)
-            .HasForeignKey(er => er.EventId);
+            .HasForeignKey(er => er.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Event>()
             .HasMany(e => e.EventTasks)
             .WithOne(t => t.Event)
-            .HasForeignKey(t => t.EventId);
+            .HasForeignKey(t => t.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

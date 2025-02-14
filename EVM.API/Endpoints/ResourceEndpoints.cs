@@ -2,6 +2,7 @@
 using EVM.Services.Features.Resourse.Models.Requests;
 using EVM.Services.Features.Resourse.Query;
 using Microsoft.AspNetCore.Mvc;
+using Stripe.Forwarding;
 
 namespace EVM.API.Endpoints;
 
@@ -30,5 +31,20 @@ public class ResourceEndpoints
             CancellationToken cancellationToken) => queryHandler.Handle(id, cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
+
+        app.MapDelete(Routes.Resource.Exact("id"),
+           ([FromServices] DeleteResourcesCommandHandler commandHandler,
+           [FromRoute] Guid id,
+           CancellationToken cancellationToken) => commandHandler.Handle(id, cancellationToken))
+           .RequireAuthorization()
+           .WithTags(Tag);
+
+        app.MapPatch(Routes.Resource.Exact("id"),
+           ([FromServices] UpdateResourceCommandHandler commandHandler,
+           [FromRoute] Guid id,
+           [FromBody] UpdateResourceRequest request,
+           CancellationToken cancellationToken) => commandHandler.Handle(id, request, cancellationToken))
+           .RequireAuthorization()
+           .WithTags(Tag);
     }
 }

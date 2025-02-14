@@ -15,33 +15,24 @@ public class DeleteEventCommandHandler
 {
     private readonly HttpContext _httpContext = _httpContextAccessor.HttpContext ?? throw new MissingHttpContextException();
 
-    public async Task<ApiResponse<BaseResponse>> Handle(Guid eventId, CancellationToken cancellationToken)
+    public async Task<ApiResponse> Handle(Guid eventId, CancellationToken cancellationToken)
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Read", "Event");
 
         var userId = _httpContext.User?.GetId()
             ?? throw new UserNotFoundException();
 
-        var user = await _appDbContext.Users
-            .Where(x => x.Id == userId)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new UserNotFoundException();
-
-        if (user.Role != Data.Enums.UserRole.Organizer)
-        {
-            user.Role = Data.Enums.UserRole.Organizer;
-        }
-
-        var deletedRows = await _appDbContext.Events
-            .Where(x => x.Id == eventId)
+        var deletedCount = await _appDbContext.Events
+            .Where(x => x.Id == eventId && x.UserId == userId && x.Role == Data.Enums.UserRole.Organizer)
             .ExecuteDeleteAsync(cancellationToken);
 
-        if (deletedRows == 0)
+        if (deletedCount == 0)
         {
-            throw new BaseCustomException("Couldn't delete the data in the database. Please try again later!", HttpStatusCode.InternalServerError);
+            _logger.LogWarning("Failed to delete event with ID: {EventId}. Event not found or insufficient permissions.", eventId);
+            throw new BaseCustomException("Event not found or you don't have permission to delete it!", HttpStatusCode.NotFound);
         }
 
-        _logger.LogInformation("Event with ID: {eventId} was deleted successfully!", eventId);
-        return new(new() { Id = eventId });
+        _logger.LogInformation("Event with ID: {EventId} was deleted successfully!", eventId);
+        return new(HttpStatusCode.OK, "Event was deleted successfully.");
     }
 }

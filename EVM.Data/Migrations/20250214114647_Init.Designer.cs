@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EVM.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250210155342_Init")]
+    [Migration("20250214114647_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -260,6 +260,9 @@ namespace EVM.Data.Migrations
 
                     b.Property<Guid>("ResourceId")
                         .HasColumnType("uuid");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");

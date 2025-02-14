@@ -2,7 +2,7 @@
 
 public record CreateResourceRequest
 {
-    public required List<CreateResource> Resources { get; set; }
+    public required List<ResourceRequest> Resources { get; set; }
 
     public required Guid EventId { get; set; }
 }

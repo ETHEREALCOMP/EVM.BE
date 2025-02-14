@@ -7,4 +7,6 @@ public record CreateEventTaskRequest
     public string? Description { get; set; }
 
     public required Guid EventId { get; set; }
+
+    public Data.Enums.TaskStatus? Status { get; set; }
 }

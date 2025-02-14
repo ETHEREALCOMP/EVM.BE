@@ -3,13 +3,13 @@ using EVM.Data.Models.ResourceFeature;
 
 namespace EVM.Services.Features.Resourse.Models.Requests;
 
-public class CreateResource
+public class ResourceRequest
 {
     public required string Name { get; set; }
 
     public required ResourceType Type { get; set; }
 
-    public static implicit operator Resource(CreateResource createResourse)
+    public static implicit operator Resource(ResourceRequest createResourse)
     {
         return new Resource
         {

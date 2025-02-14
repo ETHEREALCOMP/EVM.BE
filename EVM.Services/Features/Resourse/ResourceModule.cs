@@ -12,5 +12,7 @@ public class ResourceModule
         services.AddScoped<CreateResourceCommandHandler>();
         services.AddScoped<GetByIdResourceQueryHandler>();
         services.AddScoped<GetResourceQueryHandler>();
+        services.AddScoped<DeleteResourcesCommandHandler>();
+        services.AddScoped<UpdateResourceCommandHandler>();
     }
 }

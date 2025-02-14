@@ -23,34 +23,36 @@ public class UpdateEventCommandHandler
         var userId = _httpContext.User?.GetId()
             ?? throw new UserNotFoundException();
 
-        var user = await _appDbContext.Users
-            .Where(x => x.Id == userId)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new UserNotFoundException();
+        var existingEvent = await _appDbContext.Events
+            .Where(x => x.Id == eventId &&
+            x.UserId == userId && 
+            x.Role == Data.Enums.UserRole.Organizer)
+            .AsTracking()
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (user.Role != Data.Enums.UserRole.Organizer)
+        if (existingEvent is null)
         {
-            user.Role = Data.Enums.UserRole.Organizer;
+            _logger.LogWarning("Event with ID: {EventId} for User: {UserId} not found or insufficient permissions.", eventId, userId);
+            throw new BaseCustomException("Event not found or you don't have permission to update it!", HttpStatusCode.NotFound);
         }
 
-        var existingEvent = _appDbContext.Events
-            .AsTracking()
-            .FirstOrDefault(x => x.Id == eventId)
-            ?? throw new BaseCustomException("Event was not found!", HttpStatusCode.NotFound);
+        var updatedCount = await _appDbContext.Events
+        .Where(e => e.Id == eventId && e.UserId == userId)
+        .ExecuteUpdateAsync(
+            setters => setters
+            .SetProperty(e => e.Title, request.Title ?? existingEvent.Title)
+            .SetProperty(e => e.Description, request.Description)
+            .SetProperty(e => e.Location, request.Location ?? existingEvent.Location)
+            .SetProperty(e => e.CreatedOn, DateTime.UtcNow),
+            cancellationToken);
 
-        existingEvent.Title = request.Title ?? existingEvent.Title;
-        existingEvent.Description = request.Description;
-        existingEvent.Location = request.Location ?? existingEvent.Location;
-        existingEvent.CreatedOn = DateTime.UtcNow;
-        existingEvent.UserId = userId;
-        existingEvent.Role = user.Role;
-
-        if (await _appDbContext.SaveChangesAsync(cancellationToken) == 0)
+        if (updatedCount == 0)
         {
+            _logger.LogError("Failed to update event with ID: {EventId}.", eventId);
             throw new BaseCustomException("Couldn't update the data in the database. Please try again later!", HttpStatusCode.InternalServerError);
         }
 
-        _logger.LogInformation("Event with ID: {EventId} was updated successfully!", existingEvent.Id);
-        return new(new() { Id = existingEvent.Id });
+        _logger.LogInformation("Event with ID: {EventId} was updated successfully!", eventId);
+        return new(new() { Id = eventId });
     }
 }

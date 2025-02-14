@@ -1,4 +1,5 @@
-﻿using EVM.Data.Models.EventFeature;
+﻿using EVM.Data.Enums;
+using EVM.Data.Models.EventFeature;
 using EVM.Data.Models.IdentityFeature;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ public class EventResource : IDBConfigurableModel
     public required Guid UserId { get; set; }
 
     public virtual User? User { get; set; }
+
+    public required UserRole Role { get; set; }
 
     public required Guid EventId { get; set; }
 

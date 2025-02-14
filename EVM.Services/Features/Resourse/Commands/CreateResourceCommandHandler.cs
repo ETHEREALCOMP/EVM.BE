@@ -22,31 +22,35 @@ public class CreateResourceCommandHandler
     {
         await _authorizationService.CanPerformActionAsync(_httpContext.User, "Create", "Resource");
 
-        var userId = _httpContext.User?.GetId()
-            ?? throw new UserNotFoundException();
+        var userId = _httpContext.User?.GetId() ?? throw new UserNotFoundException();
 
-        var resources = request.Resources.Select(x => (Resource)x).ToList();
+        var isOrganizer = await _appDbContext.Events
+            .Where(x => x.UserId == userId && x.Role == Data.Enums.UserRole.Organizer)
+            .AnyAsync(cancellationToken);
 
-        var user = await _appDbContext.Events
-               .Where(x => x.UserId == userId)
-               .FirstOrDefaultAsync(cancellationToken)
-               ?? throw new UserNotFoundException();
-
-        if (user.Role != Data.Enums.UserRole.Organizer)
+        if (!isOrganizer)
         {
-            return new(HttpStatusCode.Conflict, "You can`t create tasks");
+            return new(HttpStatusCode.Conflict, "You can`t create resources");
         }
 
-        var eventResources = resources.Select(x => new EventResource
+        var resources = request.Resources.Select(r => new Resource
+        {
+            Name = r.Name,
+            Type = r.Type,
+        }).ToList();
+
+        var eventResources = resources.Select(r => new EventResource
         {
             UserId = userId,
             EventId = request.EventId,
-            ResourceId = x.Id,
-        }).ToList();
+            ResourceId = r.Id,
+            Role = Data.Enums.UserRole.Organizer,
+        });
 
         _appDbContext.Resources.AddRange(resources);
+        _appDbContext.EventResources.AddRange(eventResources);
         await _appDbContext.SaveChangesAsync(cancellationToken);
 
-        return new(new() { Ids = resources.Select(x => x.Id).ToList() });
+        return new(new() { Ids = resources.Select(r => r.Id).ToList() });
     }
 }

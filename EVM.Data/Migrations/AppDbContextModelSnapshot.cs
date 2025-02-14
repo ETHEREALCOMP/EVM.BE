@@ -258,6 +258,9 @@ namespace EVM.Data.Migrations
                     b.Property<Guid>("ResourceId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
 
