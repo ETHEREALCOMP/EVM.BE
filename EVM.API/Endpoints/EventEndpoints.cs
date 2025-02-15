@@ -18,7 +18,7 @@ public class EventEndpoints
             .AllowAnonymous()
             .WithTags(Tag);
 
-        app.MapPost(Routes.Event.EventTask.Base,
+        app.MapPost(Routes.EventTask.Base,
             ([FromServices] CreateEventTasksCommandHandler commandHandler,
             [FromBody] CreateEventTaskRequest request,
             CancellationToken cancellationToken) => commandHandler.Handle(request, cancellationToken))
@@ -53,17 +53,10 @@ public class EventEndpoints
             .RequireAuthorization()
             .WithTags(Tag);
 
-        app.MapGet(Routes.Event.EventTask.Exact("id"),
-            ([FromServices] GetAllTaskQueryHandler queryHandler,
-            [FromRoute] Guid eventId,
-            CancellationToken cancellationToken) => queryHandler.Handle(eventId, cancellationToken))
-            .RequireAuthorization()
-            .WithTags(Tag);
-
-        app.MapGet(Routes.Event.EventTask.Exact("id"),
+        app.MapGet(Routes.EventTask.Exact("id"),
             ([FromServices] GetByIdEventQueryHandler queryHandler,
-            [FromRoute] Guid taskId,
-            CancellationToken cancellationToken) => queryHandler.Handle(taskId, cancellationToken))
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken) => queryHandler.Handle(id, cancellationToken))
             .RequireAuthorization()
             .WithTags(Tag);
     }
