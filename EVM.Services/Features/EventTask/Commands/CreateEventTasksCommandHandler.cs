@@ -1,7 +1,7 @@
 ﻿using EVM.Data;
 using EVM.Services.Exceptions;
 using EVM.Services.Extensions;
-using EVM.Services.Features.Event.Models.Requests;
+using EVM.Services.Features.EventTask.Models.Requests;
 using EVM.Services.Features.Models.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using SendGrid.Helpers.Errors.Model;
 using System.Net;
 
-namespace EVM.Services.Features.Event.Commands;
+namespace EVM.Services.Features.EventTask.Commands;
 
 public class CreateEventTasksCommandHandler
     (ILogger<CreateEventTasksCommandHandler> _logger, AppDbContext _appDbContext, IHttpContextAccessor _httpContextAccessor, IAuthorizationService _authorizationService)
@@ -37,9 +37,7 @@ public class CreateEventTasksCommandHandler
             ?? throw new UserNotFoundException();
 
         if (user.Role != Data.Enums.UserRole.Organizer)
-        {
             return new(HttpStatusCode.Conflict, "You can`t create tasks");
-        }
 
         var newEventTasks = new Data.Models.EventFeature.EventTask
         {

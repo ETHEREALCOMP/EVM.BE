@@ -29,6 +29,7 @@ public class EventTask : IDBConfigurableModel
         builder.Entity<EventTask>()
             .HasOne(t => t.Event)
             .WithMany(e => e.EventTasks)
-            .HasForeignKey(t => t.EventId);
+            .HasForeignKey(t => t.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

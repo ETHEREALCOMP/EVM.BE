@@ -1,9 +1,9 @@
 ﻿using EVM.Data.Models.IdentityFeature;
 using System;
 
-namespace EVM.Services.Features.Event.Models.Responses;
+namespace EVM.Services.Features.EventTask.Models.Responses;
 
-public class GetTaskResponse
+public class GetEventTaskResponse
 {
     public required Guid TaskId { get; set; }
 

@@ -1,4 +1,4 @@
-﻿namespace EVM.Services.Features.Event.Models.Requests;
+﻿namespace EVM.Services.Features.EventTask.Models.Requests;
 
 public record CreateEventTaskRequest
 {
