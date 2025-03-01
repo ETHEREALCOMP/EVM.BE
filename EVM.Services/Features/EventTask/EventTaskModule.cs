@@ -16,7 +16,6 @@ public class EventTaskModule
     public static void Register(IServiceCollection services)
     {
         services.AddScoped<CreateEventTasksCommandHandler>();
-        services.AddScoped<GetAllEventTaskQueryHandler>();
         services.AddScoped<GetByIdEventTaskQueryHandler>();
         services.AddScoped<UpdateEventTaskCommandHandler>();
         services.AddScoped<DeleteEventTaskCommandHandler>();

@@ -11,12 +11,9 @@ public class EventModule
     public static void Register(IServiceCollection services)
     {
         services.AddScoped<CreateEventCommandHandler>();
-        services.AddScoped<CreateEventTasksCommandHandler>();
         services.AddScoped<GetAllEventsQueryHandler>();
         services.AddScoped<GetByIdEventQueryHandler>();
         services.AddScoped<UpdateEventCommandHandler>();
         services.AddScoped<DeleteEventCommandHandler>();
-        services.AddScoped<GetAllEventTaskQueryHandler>();
-        services.AddScoped<GetByIdEventTaskQueryHandler>();
     }
 }
